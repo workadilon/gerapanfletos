@@ -97,6 +97,37 @@
     #pf-v7-object-search { width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:9px; font-size:12px; }
     .pf-v7-help { font-size:11px; line-height:1.5; color:#64748b; }
     #pf-v7-properties[hidden], #pf-v7-browser[hidden], #pf-v7-properties [hidden] { display:none !important; }
+
+    /* Tela de carregamento (inicialização e funções mais demoradas) */
+    #pf-loading { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center;
+      background: rgba(15,23,42,.88); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; color: #fff; padding: 24px; }
+    #pf-loading.pf-loading-on { display: flex; }
+    #pf-loading .pf-loading-card { width: min(360px, 100%); text-align: center; background: #0f172a; border: 1px solid #334155;
+      border-radius: 20px; padding: 28px 24px; box-shadow: 0 25px 60px rgba(0,0,0,.45); }
+    #pf-loading .pf-loading-brand { font-size: 13px; font-weight: 900; letter-spacing: .14em; margin-bottom: 16px; font-family: Montserrat, Inter, sans-serif; }
+    #pf-loading .pf-loading-brand span { color: #fbbf24; }
+    #pf-loading .pf-loading-spinner { width: 44px; height: 44px; margin: 0 auto 16px; border-radius: 50%;
+      border: 4px solid #334155; border-top-color: #f59e0b; animation: pfSpin .8s linear infinite; }
+    #pf-loading .pf-loading-title { font-size: 15px; font-weight: 800; }
+    #pf-loading .pf-loading-detail { font-size: 12px; color: #94a3b8; margin-top: 6px; line-height: 1.5; min-height: 18px; }
+    #pf-loading .pf-loading-bar { height: 4px; border-radius: 999px; background: #1e293b; margin-top: 18px; overflow: hidden; position: relative; }
+    #pf-loading .pf-loading-bar::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 40%;
+      background: linear-gradient(90deg, #f59e0b, #ef4444); border-radius: 999px; animation: pfBar 1.2s ease-in-out infinite; }
+    @keyframes pfSpin { to { transform: rotate(360deg); } }
+    @keyframes pfBar { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+    @keyframes pfFailsafe { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+    /* Segurança: se o script falhar, a tela inicial some sozinha após 15 s. */
+    #pf-loading.pf-loading-init { animation: pfFailsafe .3s ease 15s forwards; }
+    @media (prefers-reduced-motion: reduce) {
+      #pf-loading .pf-loading-spinner { animation-duration: 2.4s; }
+      #pf-loading .pf-loading-bar::after { animation-duration: 3s; }
+    }
+    @media print {
+      #pf-loading { display: none !important; }
+      @page { margin: 0; }
+      #flyer-preview-container, #flyer-preview-container * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
     /* Print styling */
     @media print {
       body * {
@@ -121,6 +152,17 @@
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-white">
+
+  <!-- TELA DE CARREGAMENTO -->
+  <div id="pf-loading" class="pf-loading-on pf-loading-init no-print" role="status" aria-live="polite">
+    <div class="pf-loading-card">
+      <div class="pf-loading-brand">PROMO<span>FLYER</span></div>
+      <div class="pf-loading-spinner" aria-hidden="true"></div>
+      <div class="pf-loading-title" id="pf-loading-title">Iniciando o PromoFlyer…</div>
+      <div class="pf-loading-detail" id="pf-loading-detail">Carregando projeto, fontes e ícones</div>
+      <div class="pf-loading-bar" aria-hidden="true"></div>
+    </div>
+  </div>
 
   <!-- HEADER NAVEGAÇÃO -->
   <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md no-print">
@@ -152,7 +194,7 @@
           <i data-lucide="image-down" class="w-4 h-4"></i>
           <span class="hidden sm:inline">Salvar PNG</span><span class="sm:hidden">PNG</span>
         </button>
-        <button onclick="window.print()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-4 py-2 rounded-lg shadow-lg shadow-amber-500/20 transition flex items-center gap-2">
+        <button id="btn-export-pdf" type="button" onclick="exportFlyerPdf()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-4 py-2 rounded-lg shadow-lg shadow-amber-500/20 transition flex items-center gap-2">
           <i data-lucide="printer" class="w-4 h-4"></i>
           <span>Imprimir / PDF</span>
         </button>
@@ -1439,6 +1481,7 @@
         setSaveStatus('Projeto de exemplo carregado. As próximas alterações serão salvas automaticamente.');
       }
       refreshIcons();
+      if (window.PFLoading) window.PFLoading.finishInit();
     });
 
 
@@ -2712,6 +2755,41 @@ async function blobToDataUrl(blob) {
 function dataUriFromSvg(svg) {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
+let pfEmbeddedFontCss = null;
+function escapeXmlText(text) {
+  return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+// Fontes do Google (Inter, Montserrat, Teko) não carregam dentro de uma imagem SVG:
+// por isso são baixadas uma vez e embutidas como Data URL, mantendo a tipografia do panfleto.
+async function buildEmbeddedFontCss() {
+  if (pfEmbeddedFontCss !== null) return pfEmbeddedFontCss;
+  let css = '';
+  try {
+    const urlCache = new Map();
+    const links = [...document.querySelectorAll('link[rel="stylesheet"][href*="fonts.googleapis.com"]')];
+    for (const link of links) {
+      const response = await fetch(link.href, { mode: 'cors', credentials: 'omit' });
+      if (!response.ok) continue;
+      const text = await response.text();
+      const blocks = [...text.matchAll(/\/\*\s*([a-z-]+)\s*\*\/\s*(@font-face\s*\{[^}]*\})/g)];
+      for (const [, subset, face] of blocks) {
+        if (subset !== 'latin') continue; // cobre o português (acentos inclusos)
+        const match = face.match(/url\(['"]?(https:[^'")]+)['"]?\)/);
+        if (!match) continue;
+        let dataUrl = urlCache.get(match[1]);
+        if (!dataUrl) {
+          const fontResponse = await fetch(match[1], { mode: 'cors', credentials: 'omit' });
+          if (!fontResponse.ok) continue;
+          dataUrl = await blobToDataUrl(await fontResponse.blob());
+          urlCache.set(match[1], dataUrl);
+        }
+        css += face.replace(match[0], `url(${dataUrl})`) + '\n';
+      }
+    }
+  } catch (_) { css = ''; }
+  pfEmbeddedFontCss = css;
+  return css;
+}
 async function exportViaSvgForeignObject(root, scale) {
   const width = Math.ceil(root.getBoundingClientRect().width);
   const height = Math.ceil(root.scrollHeight);
@@ -2727,7 +2805,10 @@ async function exportViaSvgForeignObject(root, scale) {
     for (const prop of cs) {
       try { dest.style.setProperty(prop, cs.getPropertyValue(prop), cs.getPropertyPriority(prop)); } catch (_) {}
     }
-    if (dest.classList?.contains('pf-selected-element')) dest.style.outline = 'none';
+    if (dest.classList?.contains('pf-selected-element') || dest.hasAttribute?.('data-pf-edit-key')) {
+      dest.style.setProperty('outline', 'none');
+      dest.style.setProperty('outline-offset', '0');
+    }
   }
   let unavailableImages = 0;
   const images = [...clone.querySelectorAll('img')];
@@ -2748,7 +2829,9 @@ async function exportViaSvgForeignObject(root, scale) {
   clone.style.width = `${width}px`;
   clone.style.height = `${height}px`;
   const html = new XMLSerializer().serializeToString(clone);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${html}</foreignObject></svg>`;
+  const fontCss = await buildEmbeddedFontCss();
+  const fontStyle = fontCss ? `<style xmlns="http://www.w3.org/1999/xhtml">${escapeXmlText(fontCss)}</style>` : '';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${fontStyle}${html}</foreignObject></svg>`;
   const rendered = new Image();
   await new Promise((resolve, reject) => {
     rendered.onload = resolve;
@@ -2760,9 +2843,15 @@ async function exportViaSvgForeignObject(root, scale) {
   out.height = Math.round(height * scale);
   const context = out.getContext('2d');
   context.scale(scale, scale);
-  context.fillStyle = '#ffffff';
-  context.fillRect(0, 0, width, height);
-  context.drawImage(rendered, 0, 0, width, height);
+  const paint = () => {
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, width, height);
+    context.drawImage(rendered, 0, 0, width, height);
+  };
+  paint();
+  // As fontes embutidas decodificam de forma assíncrona: aguarda e desenha de novo.
+  await new Promise(resolve => setTimeout(resolve, 250));
+  paint();
   return { canvas: out, unavailableImages };
 }
 function canvasToPngBlob(canvas) {
@@ -2783,32 +2872,32 @@ async function exportFlyerPng() {
     if (document.fonts?.ready) await document.fonts.ready;
     const scale = 2;
     let capture = null;
-    let fallbackUsed = false;
     let missingImages = 0;
-    if (typeof window.html2canvas === 'function') {
-      try {
-        capture = await window.html2canvas(root, {
-          scale,
-          useCORS: true,
-          allowTaint: false,
-          backgroundColor: '#ffffff',
-          logging: false,
-          scrollX: 0,
-          scrollY: -window.scrollY,
-          onclone: doc => {
-            const el = doc.getElementById('flyer-preview-container');
-            el?.classList.remove('pf-edit-mode');
-            el?.querySelectorAll('.pf-selected-element').forEach(n => n.classList.remove('pf-selected-element'));
-          }
-        });
-      } catch (error) { capture = null; }
-    }
-    if (!capture) {
-      fallbackUsed = true;
+    // Motor principal: renderização do próprio navegador (mesma ordem, cores e camadas da tela).
+    try {
       const result = await exportViaSvgForeignObject(root, scale);
+      result.canvas.getContext('2d').getImageData(0, 0, 1, 1); // falha se o canvas estiver contaminado
       capture = result.canvas;
       missingImages = result.unavailableImages;
+    } catch (error) { capture = null; }
+    // Reserva: html2canvas (aproximação; pode divergir em camadas, gradientes e filtros).
+    if (!capture && typeof window.html2canvas === 'function') {
+      capture = await window.html2canvas(root, {
+        scale,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: '#ffffff',
+        logging: false,
+        scrollX: 0,
+        scrollY: -window.scrollY,
+        onclone: doc => {
+          const el = doc.getElementById('flyer-preview-container');
+          el?.classList.remove('pf-edit-mode');
+          el?.querySelectorAll('.pf-selected-element').forEach(n => n.classList.remove('pf-selected-element'));
+        }
+      });
     }
+    if (!capture) throw new Error('Nenhum motor de exportação conseguiu renderizar o panfleto.');
     const blob = await canvasToPngBlob(capture);
     const stamp = new Date().toISOString().slice(0, 10);
     triggerBlobDownload(blob, `${safeFilePart(getValue('store-name'))}-${safeFilePart(currentLayoutFormat)}-${stamp}.png`);
@@ -4059,6 +4148,153 @@ async function importTemplateFile(event) {
     // Se o projeto estava em edição, mantenha todos os objetos disponíveis.
     decorateEditableFlyer();
   });
+  </script>
+
+  <script>
+/* PromoFlyer — telas de carregamento e exportação em PDF. */
+const PFLoading = (() => {
+  const overlay = document.getElementById('pf-loading');
+  const titleEl = document.getElementById('pf-loading-title');
+  const detailEl = document.getElementById('pf-loading-detail');
+  const MIN_VISIBLE_MS = 350;
+  let depth = 1; // a tela inicial já começa visível
+  let shownAt = performance.now();
+  let initDone = false;
+
+  function nextPaint() {
+    return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
+  }
+  function show(message, detail = '') {
+    depth++;
+    shownAt = performance.now();
+    overlay.classList.remove('pf-loading-init');
+    titleEl.textContent = message;
+    detailEl.textContent = detail;
+    overlay.classList.add('pf-loading-on');
+    document.body.setAttribute('aria-busy', 'true');
+  }
+  function hide() {
+    depth = Math.max(0, depth - 1);
+    if (depth) return;
+    const wait = Math.max(0, MIN_VISIBLE_MS - (performance.now() - shownAt));
+    setTimeout(() => {
+      if (depth) return;
+      overlay.classList.remove('pf-loading-on', 'pf-loading-init');
+      document.body.removeAttribute('aria-busy');
+    }, wait);
+  }
+  async function wrap(message, task, detail = '') {
+    show(message, detail);
+    try {
+      await nextPaint(); // deixa a tela de carregamento aparecer antes do trabalho pesado
+      return await task();
+    } finally {
+      hide();
+    }
+  }
+  function finishInit() {
+    if (initDone) return;
+    initDone = true;
+    const fontsReady = document.fonts?.ready ? Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 3000))]) : Promise.resolve();
+    fontsReady.finally(() => hide());
+  }
+  // Rede de segurança: nunca deixa a tela inicial presa.
+  setTimeout(finishInit, 12000);
+  return { show, hide, wrap, finishInit, nextPaint };
+})();
+window.PFLoading = PFLoading;
+
+/* Impressão / PDF: usa a mesma imagem renderizada pelo navegador do PNG,
+   em uma página do tamanho exato do panfleto, sem margens e com cores preservadas. */
+function printFlyerBlob(blob, width, height) {
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(blob);
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('aria-hidden', 'true');
+    iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
+    document.body.appendChild(iframe);
+    let finished = false;
+    const cleanup = () => {
+      if (finished) return;
+      finished = true;
+      URL.revokeObjectURL(url);
+      iframe.remove();
+      resolve();
+    };
+    const doc = iframe.contentDocument;
+    doc.open();
+    doc.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Panfleto</title><style>
+      @page { size: ${width}px ${height}px; margin: 0; }
+      html, body { margin: 0; padding: 0; background: #fff; }
+      img { display: block; width: ${width}px; height: ${height}px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    </style></head><body><img id="pf-print-img" alt="Panfleto" src="${url}"></body></html>`);
+    doc.close();
+    const img = doc.getElementById('pf-print-img');
+    const go = () => {
+      try {
+        iframe.contentWindow.addEventListener('afterprint', () => setTimeout(cleanup, 500));
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      } catch (_) { cleanup(); }
+    };
+    img.onload = go;
+    img.onerror = cleanup;
+    setTimeout(cleanup, 5 * 60 * 1000);
+  });
+}
+
+async function exportFlyerPdf() {
+  const button = document.getElementById('btn-export-pdf');
+  if (button?.disabled) return;
+  if (button) button.disabled = true;
+  const root = document.getElementById('flyer-preview-container');
+  let prepared = null;
+  try {
+    prepared = await PFLoading.wrap('Preparando o PDF…', async () => {
+      root.classList.add('pf-exporting');
+      try {
+        if (document.fonts?.ready) await document.fonts.ready;
+        const scale = 3;
+        const result = await exportViaSvgForeignObject(root, scale);
+        result.canvas.getContext('2d').getImageData(0, 0, 1, 1); // falha se o canvas estiver contaminado
+        const blob = await canvasToPngBlob(result.canvas);
+        return { blob, width: result.canvas.width / scale, height: result.canvas.height / scale, missing: result.unavailableImages };
+      } finally {
+        root.classList.remove('pf-exporting');
+      }
+    }, 'Renderizando o panfleto com as mesmas cores e camadas da tela');
+  } catch (_) { prepared = null; }
+  try {
+    if (prepared) {
+      const warning = prepared.missing ? ` Atenção: ${prepared.missing} imagem(ns) remota(s) foram omitidas por bloqueio de acesso.` : '';
+      showUIStatus('image-export-status', `Abrindo a impressão. Em "Destino", escolha "Salvar como PDF".${warning}`);
+      await printFlyerBlob(prepared.blob, prepared.width, prepared.height);
+    } else {
+      showUIStatus('image-export-status', 'Não foi possível gerar a imagem do panfleto; usando a impressão padrão do navegador.', true);
+      window.print();
+    }
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+/* Ganchos: tela de carregamento nas funções mais demoradas. */
+(function attachLoadingHooks() {
+  const hook = (name, message, detail, skip) => {
+    const original = window[name];
+    if (typeof original !== 'function') return;
+    window[name] = function (...args) {
+      if (skip && skip(...args)) return original.apply(this, args);
+      return PFLoading.wrap(message, () => original.apply(this, args), detail);
+    };
+  };
+  hook('exportFlyerPng', 'Gerando a imagem PNG…', 'Renderizando em alta resolução e embutindo as fontes');
+  hook('importProductsJson', 'Importando produtos…', 'Lendo e validando o arquivo');
+  hook('importTemplateFile', 'Importando o modelo…', 'Lendo e validando o arquivo');
+  hook('pfV7UploadSelectedImage', 'Carregando a imagem…', 'Aplicando ao objeto selecionado');
+  hook('saveProjectNow', 'Salvando o projeto…', 'Gravando neste navegador');
+  hook('restoreProjectFromLocal', 'Restaurando o projeto…', 'Lendo a cópia salva neste navegador', (options) => Boolean(options && options.silent));
+})();
   </script>
 
 </body>
