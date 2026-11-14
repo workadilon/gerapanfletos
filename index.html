@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,700;0,800;0,900;1,900&family=Teko:wght@600;700&display=swap" rel="stylesheet">
+  <!-- Fontes extras para a escolha de fonte dos textos -->
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Lobster&family=Oswald:wght@500;700&family=Pacifico&family=Playfair+Display:wght@700;900&family=Poppins:wght@400;600;700;800&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <!-- Exportação PNG; quando indisponível, usa exportador SVG nativo -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
   <!-- Lucide Icons -->
@@ -128,6 +130,15 @@
       @page { margin: 0; }
       #flyer-preview-container, #flyer-preview-container * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
+    .pf-nudge:disabled { opacity: .45; cursor: not-allowed; }
+    /* Em telas largas (3 colunas) cada painel rola de forma independente. */
+    @media (min-width: 1280px) {
+      main > section { scrollbar-gutter: stable; }
+    }
+    @media print {
+      body { height: auto !important; overflow: visible !important; }
+      main, main > section { height: auto !important; overflow: visible !important; }
+    }
     /* Print styling */
     @media print {
       body * {
@@ -151,7 +162,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-white">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen xl:h-screen xl:overflow-hidden flex flex-col antialiased selection:bg-amber-500 selection:text-white">
 
   <!-- TELA DE CARREGAMENTO -->
   <div id="pf-loading" class="pf-loading-on pf-loading-init no-print" role="status" aria-live="polite">
@@ -203,10 +214,10 @@
   </header>
 
   <!-- CONTEÚDO PRINCIPAL (PAINEL SPLIT) -->
-  <main class="flex-1 max-w-[1800px] w-full mx-auto p-3 md:p-5 grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[clamp(260px,21vw,300px)_minmax(0,1fr)_clamp(290px,24vw,350px)] gap-4 xl:gap-5">
+  <main class="flex-1 xl:min-h-0 xl:overflow-hidden xl:grid-rows-[minmax(0,1fr)] max-w-[1800px] w-full mx-auto p-3 md:p-5 grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[clamp(260px,21vw,300px)_minmax(0,1fr)_clamp(290px,24vw,350px)] gap-4 xl:gap-5">
     
     <!-- COLUNA DA ESQUERDA: PAINÉIS LATERAIS (compactos) -->
-    <section class="space-y-3 no-print min-w-0">
+    <section class="space-y-3 no-print min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-1">
       
       <!-- PROJETO LOCAL -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -670,10 +681,10 @@
     </section>
 
     <!-- COLUNA CENTRAL: VISUALIZAÇÃO AO VIVO -->
-    <section class="flex flex-col gap-4 min-w-0">
+    <section class="flex flex-col gap-4 min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-1">
       <div id="contrast-status" class="no-print text-[11px] text-slate-600 flex items-center gap-2" role="status" aria-live="polite"><i data-lucide="eye" class="w-3.5 h-3.5"></i><span>Contraste automático de textos ativado.</span></div>
       <p id="image-export-status" class="text-xs text-slate-600 no-print" role="status" aria-live="polite"></p>
-      <div class="sticky top-20">
+      <div>
         
         <!-- BARRA SUPERIOR DA PRÉVIA -->
         <div class="flex items-center justify-between mb-3 no-print">
@@ -710,7 +721,7 @@
     </section>
 
     <!-- COLUNA DA DIREITA: PERSONALIZAÇÃO VISUAL AVANÇADA -->
-    <section id="pf-right-panel" class="lg:col-span-2 xl:col-span-1 no-print min-w-0 xl:sticky xl:top-20 xl:self-start xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto">
+    <section id="pf-right-panel" class="lg:col-span-2 xl:col-span-1 no-print min-w-0 xl:min-h-0 xl:overflow-y-auto xl:pr-1">
       <!-- EDITOR DE ELEMENTOS DO PANFLETO -->
       <div class="bg-white rounded-2xl border border-slate-200 p-4 no-print space-y-3">
         <div class="flex items-center justify-between gap-2 flex-wrap">
@@ -719,6 +730,12 @@
             <p class="text-[11px] text-slate-500">Ative a edição, toque para selecionar e arraste o elemento para reposicioná-lo; use X/Y para ajustes precisos.</p>
           </div>
           <button type="button" id="toggle-edit-mode" onclick="toggleVisualEditor()" class="rounded-lg bg-slate-900 hover:bg-slate-700 text-white text-xs font-bold px-3 py-2 flex items-center gap-1.5"><i data-lucide="mouse-pointer-click" class="w-4 h-4"></i><span id="edit-mode-label">Ativar edição</span></button>
+        </div>
+        <div id="pf-history-toolbar" class="flex items-center gap-2 flex-wrap">
+          <button type="button" id="pf-undo-btn" onclick="PFHistory.undo()" class="pf-nudge" disabled title="Desfazer (Ctrl+Z)">↶ Desfazer</button>
+          <button type="button" id="pf-redo-btn" onclick="PFHistory.redo()" class="pf-nudge" disabled title="Refazer (Ctrl+Shift+Z ou Ctrl+Y)">↷ Refazer</button>
+          <span class="text-[11px] text-slate-500">Ctrl+Z / Ctrl+Y</span>
+          <span id="pf-history-status" class="text-[11px] text-emerald-700 font-semibold" role="status" aria-live="polite"></span>
         </div>
         <!-- Inserir texto autoral diretamente na peça (visível somente no modo de edição). -->
         <div id="pf-add-text-toolbar" class="hidden border-t border-slate-100 pt-3 space-y-2">
@@ -763,6 +780,11 @@
               <label class="text-[11px] font-semibold text-slate-600">Alinhamento
                 <select id="style-align" onchange="setSelectedStyle('textAlign',this.value)" class="block w-full rounded-lg border border-slate-300 p-2 text-sm mt-1">
                   <option value="left">Esquerda</option><option value="center">Centro</option><option value="right">Direita</option>
+                </select>
+              </label>
+              <label class="text-[11px] font-semibold text-slate-600 col-span-2">Fonte do texto
+                <select id="style-font-family" onchange="setSelectedFontFamily(this.value)" class="block w-full rounded-lg border border-slate-300 p-2 text-sm mt-1">
+                  <option value="">Original do layout</option>
                 </select>
               </label>
             </div>
@@ -2755,39 +2777,60 @@ async function blobToDataUrl(blob) {
 function dataUriFromSvg(svg) {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
-let pfEmbeddedFontCss = null;
+let pfFontFaceList = null;
+const pfFontDataCache = new Map();
 function escapeXmlText(text) {
   return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-// Fontes do Google (Inter, Montserrat, Teko) não carregam dentro de uma imagem SVG:
-// por isso são baixadas uma vez e embutidas como Data URL, mantendo a tipografia do panfleto.
-async function buildEmbeddedFontCss() {
-  if (pfEmbeddedFontCss !== null) return pfEmbeddedFontCss;
-  let css = '';
-  try {
-    const urlCache = new Map();
-    const links = [...document.querySelectorAll('link[rel="stylesheet"][href*="fonts.googleapis.com"]')];
-    for (const link of links) {
+// Famílias de fonte realmente usadas dentro do panfleto (evita embutir fontes desnecessárias).
+function collectUsedFontFamilies(root) {
+  const used = new Set();
+  for (const el of [root, ...root.querySelectorAll('*')]) {
+    getComputedStyle(el).fontFamily.split(',').forEach(name => {
+      used.add(name.trim().replace(/^['"]|['"]$/g, '').toLowerCase());
+    });
+  }
+  return used;
+}
+// Lista as fontes do Google (somente o subconjunto latino, que cobre o português) uma única vez.
+async function loadGoogleFontFaces() {
+  const faces = [];
+  const links = [...document.querySelectorAll('link[rel="stylesheet"][href*="fonts.googleapis.com"]')];
+  for (const link of links) {
+    try {
       const response = await fetch(link.href, { mode: 'cors', credentials: 'omit' });
       if (!response.ok) continue;
       const text = await response.text();
       const blocks = [...text.matchAll(/\/\*\s*([a-z-]+)\s*\*\/\s*(@font-face\s*\{[^}]*\})/g)];
       for (const [, subset, face] of blocks) {
-        if (subset !== 'latin') continue; // cobre o português (acentos inclusos)
-        const match = face.match(/url\(['"]?(https:[^'")]+)['"]?\)/);
-        if (!match) continue;
-        let dataUrl = urlCache.get(match[1]);
+        if (subset !== 'latin') continue;
+        const urlMatch = face.match(/url\(['"]?(https:[^'")]+)['"]?\)/);
+        const familyMatch = face.match(/font-family:\s*['"]?([^;'"]+)['"]?\s*;/);
+        if (urlMatch && familyMatch) faces.push({ family: familyMatch[1].trim().toLowerCase(), face, urlText: urlMatch[0], url: urlMatch[1] });
+      }
+    } catch (_) { /* segue com as demais folhas de estilo */ }
+  }
+  return faces;
+}
+// As fontes não carregam dentro de uma imagem SVG: as usadas no panfleto são embutidas como Data URL.
+async function buildEmbeddedFontCss(usedFamilies) {
+  let css = '';
+  try {
+    if (pfFontFaceList === null) pfFontFaceList = await loadGoogleFontFaces();
+    for (const item of pfFontFaceList) {
+      if (usedFamilies && !usedFamilies.has(item.family)) continue;
+      try {
+        let dataUrl = pfFontDataCache.get(item.url);
         if (!dataUrl) {
-          const fontResponse = await fetch(match[1], { mode: 'cors', credentials: 'omit' });
+          const fontResponse = await fetch(item.url, { mode: 'cors', credentials: 'omit' });
           if (!fontResponse.ok) continue;
           dataUrl = await blobToDataUrl(await fontResponse.blob());
-          urlCache.set(match[1], dataUrl);
+          pfFontDataCache.set(item.url, dataUrl);
         }
-        css += face.replace(match[0], `url(${dataUrl})`) + '\n';
-      }
+        css += item.face.replace(item.urlText, `url(${dataUrl})`) + '\n';
+      } catch (_) { /* fonte indisponível: o navegador usa a alternativa */ }
     }
   } catch (_) { css = ''; }
-  pfEmbeddedFontCss = css;
   return css;
 }
 async function exportViaSvgForeignObject(root, scale) {
@@ -2829,7 +2872,7 @@ async function exportViaSvgForeignObject(root, scale) {
   clone.style.width = `${width}px`;
   clone.style.height = `${height}px`;
   const html = new XMLSerializer().serializeToString(clone);
-  const fontCss = await buildEmbeddedFontCss();
+  const fontCss = await buildEmbeddedFontCss(collectUsedFontFamilies(root));
   const fontStyle = fontCss ? `<style xmlns="http://www.w3.org/1999/xhtml">${escapeXmlText(fontCss)}</style>` : '';
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><foreignObject width="100%" height="100%">${fontStyle}${html}</foreignObject></svg>`;
   const rendered = new Image();
@@ -4295,6 +4338,235 @@ async function exportFlyerPdf() {
   hook('saveProjectNow', 'Salvando o projeto…', 'Gravando neste navegador');
   hook('restoreProjectFromLocal', 'Restaurando o projeto…', 'Lendo a cópia salva neste navegador', (options) => Boolean(options && options.silent));
 })();
+  </script>
+
+  <script>
+/* PromoFlyer — fonte dos textos e histórico de alterações (desfazer/refazer). */
+const PF_FONT_FAMILIES = {
+  'Montserrat': "Montserrat, sans-serif",
+  'Poppins': "Poppins, sans-serif",
+  'Bebas Neue': "'Bebas Neue', sans-serif",
+  'Anton': "Anton, sans-serif",
+  'Oswald': "Oswald, sans-serif",
+  'Teko': "Teko, sans-serif",
+  'Playfair Display': "'Playfair Display', serif",
+  'Lobster': "Lobster, cursive",
+  'Pacifico': "Pacifico, cursive",
+  'Inter': "Inter, sans-serif",
+  'Roboto': "Roboto, sans-serif",
+  'Arial': "Arial, Helvetica, sans-serif",
+  'Verdana': "Verdana, Geneva, sans-serif",
+  'Trebuchet MS': "'Trebuchet MS', sans-serif",
+  'Georgia': "Georgia, serif",
+  'Times New Roman': "'Times New Roman', Times, serif",
+  'Courier New': "'Courier New', monospace",
+  'Impact': "Impact, 'Arial Narrow Bold', sans-serif"
+};
+(function setupFontSelect() {
+  const select = document.getElementById('style-font-family');
+  if (!select) return;
+  const groups = [
+    ['Destaque e títulos', ['Montserrat','Poppins','Bebas Neue','Anton','Oswald','Teko','Playfair Display','Lobster','Pacifico']],
+    ['Leitura e sistema', ['Inter','Roboto','Arial','Verdana','Trebuchet MS','Georgia','Times New Roman','Courier New','Impact']]
+  ];
+  for (const [label, names] of groups) {
+    const group = document.createElement('optgroup');
+    group.label = label;
+    for (const name of names) {
+      const option = new Option(name, name);
+      option.style.fontFamily = PF_FONT_FAMILIES[name];
+      group.appendChild(option);
+    }
+    select.appendChild(group);
+  }
+})();
+ALLOWED_CUSTOM_STYLE_KEYS.add('fontFamily');
+
+const pfFontPrevApply = applyStyleOverride;
+applyStyleOverride = function(el, config) {
+  pfFontPrevApply(el, config);
+  if (el && config && typeof config === 'object' && el.tagName !== 'IMG'
+      && typeof config.fontFamily === 'string' && Object.hasOwn(PF_FONT_FAMILIES, config.fontFamily)) {
+    el.style.fontFamily = PF_FONT_FAMILIES[config.fontFamily];
+  }
+};
+function setSelectedFontFamily(value) {
+  if (!editorEnabled || !selectedElementKey) return;
+  if (!value) {
+    const map = getCurrentStyleMap();
+    const cfg = map[selectedElementKey];
+    if (cfg && Object.hasOwn(cfg, 'fontFamily')) {
+      delete cfg.fontFamily;
+      if (!Object.keys(cfg).length) delete map[selectedElementKey];
+      updateFlyer();
+      updateEditorControls();
+      scheduleProjectSave();
+    }
+    return;
+  }
+  if (!Object.hasOwn(PF_FONT_FAMILIES, value)) return;
+  setSelectedStyle('fontFamily', value);
+}
+const pfFontPrevControls = updateEditorControls;
+updateEditorControls = function() {
+  pfFontPrevControls();
+  const select = document.getElementById('style-font-family');
+  if (!select || !editorEnabled || !selectedElementKey) return;
+  const saved = getCurrentStyleMap()[selectedElementKey]?.fontFamily;
+  select.value = (saved && Object.hasOwn(PF_FONT_FAMILIES, saved)) ? saved : '';
+};
+// Modelos exportados/importados preservam a fonte escolhida.
+portableTemplateStyles = (function(previous) {
+  return function(styles) {
+    const result = previous(styles);
+    if (!styles || typeof styles !== 'object' || Array.isArray(styles)) return result;
+    for (const [name, source] of Object.entries(styles).slice(0, 4000)) {
+      if (!result[name] || !source || typeof source !== 'object') continue;
+      if (typeof source.fontFamily === 'string' && Object.hasOwn(PF_FONT_FAMILIES, source.fontFamily)) result[name].fontFamily = source.fontFamily;
+    }
+    for (const [name, source] of Object.entries(styles).slice(0, 4000)) {
+      if (result[name] || !source || typeof source !== 'object' || !/^(path:|brand-|product-|custom-text:)/.test(name)) continue;
+      if (typeof source.fontFamily === 'string' && Object.hasOwn(PF_FONT_FAMILIES, source.fontFamily)) result[name] = { fontFamily: source.fontFamily };
+    }
+    return result;
+  };
+})(portableTemplateStyles);
+
+/* Histórico: guarda o estado das personalizações (estilos + textos adicionados) por layout/modelo.
+   Alterações em sequência (digitar, arrastar, mover o seletor de cor) viram um único passo. */
+const PFHistory = (() => {
+  const MAX_ENTRIES = 60, MAX_CHARS = 80e6, IDLE_MS = 800, COMPARE_MS = 80;
+  const stacks = new Map();
+  let ctx = null, committed = null, groupStart = null;
+  let compareTimer = null, idleTimer = null, restoring = false, statusTimer = null;
+
+  const contextKey = () => { const m = getCurrentLayoutModel(); return m ? `model:${m.id}` : `base:${currentLayoutFormat}`; };
+  const capture = () => JSON.stringify({ s: getCurrentStyleMap(), t: getCurrentTextBlocks() });
+  const stackFor = key => { let st = stacks.get(key); if (!st) { st = { undo: [], redo: [] }; stacks.set(key, st); } return st; };
+  function trim(st) {
+    let total = st.undo.reduce((n, v) => n + v.length, 0);
+    while (st.undo.length > MAX_ENTRIES || (total > MAX_CHARS && st.undo.length > 1)) total -= st.undo.shift().length;
+  }
+  function updateButtons() {
+    const undoBtn = document.getElementById('pf-undo-btn');
+    const redoBtn = document.getElementById('pf-redo-btn');
+    const st = ctx ? stackFor(ctx) : { undo: [], redo: [] };
+    if (undoBtn) undoBtn.disabled = !(st.undo.length || (groupStart !== null && groupStart !== committed));
+    if (redoBtn) redoBtn.disabled = !st.redo.length;
+  }
+  function flushGroup() {
+    clearTimeout(idleTimer); idleTimer = null;
+    if (groupStart === null) return;
+    if (ctx && groupStart !== committed) { const st = stackFor(ctx); st.undo.push(groupStart); trim(st); }
+    groupStart = null;
+    updateButtons();
+  }
+  function sync() {
+    clearTimeout(compareTimer); compareTimer = null;
+    if (restoring) return;
+    const key = contextKey();
+    const now = capture();
+    if (ctx !== key) { flushGroup(); ctx = key; committed = now; updateButtons(); return; }
+    if (now === committed) return;
+    if (groupStart === null) groupStart = committed;
+    committed = now;
+    stackFor(ctx).redo.length = 0;
+    clearTimeout(idleTimer); idleTimer = setTimeout(flushGroup, IDLE_MS);
+    updateButtons();
+  }
+  function noteChange() {
+    if (restoring) return;
+    clearTimeout(compareTimer);
+    compareTimer = setTimeout(sync, COMPARE_MS);
+  }
+  function say(message) {
+    const el = document.getElementById('pf-history-status');
+    if (!el) return;
+    el.textContent = message;
+    clearTimeout(statusTimer);
+    statusTimer = setTimeout(() => { el.textContent = ''; }, 2500);
+  }
+  function apply(stateText) {
+    const data = JSON.parse(stateText);
+    restoring = true;
+    try {
+      const model = getCurrentLayoutModel();
+      if (model) { model.styles = data.s; model.textBlocks = data.t; }
+      else { baseLayoutStyleMaps[currentLayoutFormat] = data.s; baseLayoutTextBlocks[currentLayoutFormat] = data.t; }
+      updateFlyer();
+      updateEditorControls();
+      scheduleProjectSave();
+    } finally { restoring = false; }
+    committed = capture();
+    updateButtons();
+  }
+  function undo() {
+    sync(); flushGroup();
+    const st = stackFor(ctx);
+    if (!st.undo.length) { say('Nada para desfazer.'); return; }
+    st.redo.push(committed);
+    apply(st.undo.pop());
+    say('Alteração desfeita.');
+  }
+  function redo() {
+    sync(); flushGroup();
+    const st = stackFor(ctx);
+    if (!st.redo.length) { say('Nada para refazer.'); return; }
+    st.undo.push(committed);
+    apply(st.redo.pop());
+    say('Alteração refeita.');
+  }
+  function reset() {
+    stacks.clear(); clearTimeout(idleTimer); clearTimeout(compareTimer);
+    ctx = null; committed = null; groupStart = null;
+    sync();
+  }
+  function ensureBaseline() { if (ctx === null || contextKey() !== ctx) sync(); }
+  return { undo, redo, noteChange, reset, ensureBaseline };
+})();
+window.PFHistory = PFHistory;
+
+// Toda alteração do editor passa por scheduleProjectSave: é o gancho para registrar o histórico.
+const pfHistoryPrevSchedule = scheduleProjectSave;
+scheduleProjectSave = function(...args) {
+  const result = pfHistoryPrevSchedule.apply(this, args);
+  PFHistory.noteChange();
+  return result;
+};
+// "Restaurar elemento" não salvava o projeto: passa a salvar e a entrar no histórico.
+const pfHistoryPrevResetStyle = resetSelectedElementStyle;
+resetSelectedElementStyle = function() {
+  pfHistoryPrevResetStyle();
+  scheduleProjectSave();
+};
+// Trocar de layout/modelo cria um histórico próprio; carregar projeto limpa tudo.
+const pfHistoryPrevUpdateFlyer = updateFlyer;
+updateFlyer = function() {
+  pfHistoryPrevUpdateFlyer();
+  PFHistory.ensureBaseline();
+};
+const pfHistoryPrevApplyProject = applyProjectState;
+applyProjectState = function(state) {
+  const result = pfHistoryPrevApplyProject(state);
+  PFHistory.reset();
+  return result;
+};
+PFHistory.ensureBaseline();
+
+document.addEventListener('keydown', event => {
+  if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
+  const key = event.key.toLowerCase();
+  const isUndo = key === 'z' && !event.shiftKey;
+  const isRedo = (key === 'z' && event.shiftKey) || key === 'y';
+  if (!isUndo && !isRedo) return;
+  const t = event.target;
+  const textTypes = ['', 'text', 'search', 'url', 'email', 'tel', 'password', 'number'];
+  const isTextEntry = t && (t.isContentEditable || t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && textTypes.includes(t.type)));
+  // Campos de texto fora do editor mantêm o "desfazer" nativo (digitação).
+  if (isTextEntry && !t.closest('#visual-editor-controls')) return;
+  event.preventDefault();
+  if (isUndo) PFHistory.undo(); else PFHistory.redo();
+});
   </script>
 
 </body>
