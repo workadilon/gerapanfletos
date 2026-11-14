@@ -161,21 +161,21 @@
   </header>
 
   <!-- CONTEÚDO PRINCIPAL (PAINEL SPLIT) -->
-  <main class="flex-1 max-w-[1650px] w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <main class="flex-1 max-w-[1800px] w-full mx-auto p-3 md:p-5 grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[clamp(260px,21vw,300px)_minmax(0,1fr)_clamp(290px,24vw,350px)] gap-4 xl:gap-5">
     
-    <!-- COLUNA DA ESQUERDA: FORMULÁRIO E CONTROLES (5 cols) -->
-    <section class="lg:col-span-5 space-y-6 no-print">
+    <!-- COLUNA DA ESQUERDA: PAINÉIS LATERAIS (compactos) -->
+    <section class="space-y-3 no-print min-w-0">
       
       <!-- PROJETO LOCAL -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex items-center justify-between">
+        <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center justify-between">
           <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
             <i data-lucide="save" class="w-4 h-4 text-emerald-600"></i>
             Projeto Local
           </h2>
           <span class="text-[11px] text-slate-500 font-semibold">Salvamento automático</span>
         </div>
-        <div class="p-4 space-y-3">
+        <div class="p-3 space-y-3">
           <p class="text-xs text-slate-600">Suas alterações ficam salvas no navegador deste dispositivo e são restauradas ao abrir novamente a aplicação.</p>
           <div class="flex flex-wrap gap-2">
             <button type="button" onclick="saveProjectNow()" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5">
@@ -197,11 +197,11 @@
       
       <!-- MODELOS PERSONALIZADOS -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex items-center gap-2">
+        <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center gap-2">
           <i data-lucide="copy-plus" class="w-4 h-4 text-violet-600"></i>
           <h2 class="text-sm font-bold text-slate-800">Meus Modelos de Layout</h2>
         </div>
-        <div class="p-4 space-y-3">
+        <div class="p-3 space-y-3">
           <p class="text-xs text-slate-500">Salve o modelo em um <strong>arquivo JSON</strong> para usar em outro computador ou celular. O arquivo inclui as fontes, cores, fundos, posições, dimensões, rotações, textos inseridos e o logo carregado.</p>
           <label for="saved-template-select" class="text-xs font-bold text-slate-700">Modelos salvos</label>
           <select id="saved-template-select" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"><option value="">Selecione um modelo</option></select>
@@ -239,14 +239,14 @@
           <span class="text-xs font-semibold text-slate-500">Passo 1 de 4</span>
         </div>
 
-        <div class="p-5 space-y-5">
+        <div class="p-3 space-y-5">
           <!-- 1. TIPO DE LAYOUT -->
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center justify-between">
               <span>Modelo do Panfleto</span>
               <span class="text-[10px] text-amber-700 bg-amber-50 font-extrabold px-1.5 py-0.5 rounded">8 Formatos</span>
             </label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2">
               <button type="button" onclick="setLayoutFormat('infomaq-catalog')" id="layout-btn-infomaq-catalog" class="layout-btn p-2 rounded-xl border-2 border-amber-500 bg-amber-50 text-slate-900 text-xs font-extrabold flex flex-col items-center gap-1 transition">
                 <i data-lucide="grid-3x3" class="w-5 h-5 text-amber-600"></i>
                 <span class="text-[11px]">Infomaq Grid</span>
@@ -285,7 +285,7 @@
           <!-- 2. SELETOR DE PALETAS DE CORES -->
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Paletas de Cores Dinâmicas</label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2">
               <button type="button" onclick="setPalette('black-gold')" id="palette-btn-black-gold" class="palette-btn p-2 rounded-xl border-2 border-amber-500 bg-slate-900 text-white text-[11px] font-bold flex items-center gap-2 transition">
                 <span class="w-4 h-4 rounded-full bg-gradient-to-r from-amber-400 via-red-600 to-black border border-white shrink-0"></span>
                 <span class="truncate">Black & Gold</span>
@@ -322,7 +322,7 @@
           </div>
 
           <!-- 3. Dados da Loja e Mensagens -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 pt-2 border-t border-slate-100">
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">Nome da Loja</label>
               <div class="relative">
@@ -337,7 +337,7 @@
           </div>
 
           <!-- LOGO DA LOJA: ARQUIVO LOCAL OU URL (NÃO PRECISA DE SERVIDOR) -->
-          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
             <label class="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
               <i data-lucide="image" class="w-4 h-4 text-amber-600"></i>
               Logo da Loja (opcional)
@@ -386,7 +386,7 @@
           </div>
 
           <!-- Subtítulo e Tagline -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">Subtítulo / Tagline</label>
               <input type="text" id="store-tagline" value="Celulares com preço especial e brindes na compra." oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="Ex: Tecnologia com preço especial">
@@ -398,7 +398,7 @@
           </div>
 
           <!-- Contatos & Redes Sociais -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">WhatsApp / Telefone</label>
               <input type="text" id="store-phone" value="66 8134-3028" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="66 9999-0000">
@@ -408,7 +408,7 @@
               <input type="text" id="store-social" value="@infomaq_eletro" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="@sualoja">
             </div>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
             <div>
               <label for="store-facebook" class="block text-xs font-semibold text-slate-600 mb-1">Facebook (opcional)</label>
               <input type="text" id="store-facebook" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="facebook.com/sualoja">
@@ -431,7 +431,7 @@
 
       <!-- SEÇÃO DE CONFIGURAÇÃO DE BRINDES (NOVO) -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div id="gift-section-header" class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex justify-between items-center cursor-pointer" onclick="toggleGiftsSection()">
+        <div id="gift-section-header" class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex justify-between items-center cursor-pointer" onclick="toggleGiftsSection()">
           <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
             <i data-lucide="gift" class="w-4 h-4 text-red-600"></i>
             2. Configurar Seção de Brindes Promocionais
@@ -443,7 +443,7 @@
         </div>
 
         <p id="gifts-disabled-message" class="hidden px-4 py-3 text-xs font-semibold text-slate-500 bg-slate-50">Este layout não possui área de brindes. A seção foi desativada automaticamente.</p>
-        <div id="gifts-panel" class="p-4 space-y-3 bg-amber-50/30">
+        <div id="gifts-panel" class="p-3 space-y-3 bg-amber-50/30">
           <p class="text-[11px] text-slate-500">Exibido na parte inferior dos layouts Infomaq. Personalize a frase e até 3 itens:</p>
           
           <div>
@@ -473,11 +473,11 @@
 
       <!-- CATÁLOGOS LOCAIS DE PRODUTOS -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex items-center gap-2">
+        <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center gap-2">
           <i data-lucide="boxes" class="w-4 h-4 text-sky-600"></i>
           <h2 class="font-bold text-slate-800 text-sm">Biblioteca de Produtos</h2>
         </div>
-        <div class="p-4 space-y-3">
+        <div class="p-3 space-y-3">
           <p class="text-xs text-slate-500">Guarde conjuntos de produtos para reutilizar em outros panfletos.</p>
           <label for="product-collection-select" class="text-xs font-bold text-slate-700">Conjunto salvo</label>
           <select id="product-collection-select" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-300 bg-white">
@@ -507,7 +507,7 @@
           <span class="text-xs font-semibold text-slate-500">Passo 3 de 4</span>
         </div>
 
-        <form id="product-form" onsubmit="handleProductSubmit(event)" class="p-5 space-y-4">
+        <form id="product-form" onsubmit="handleProductSubmit(event)" class="p-3 space-y-4">
           <input type="hidden" id="product-edit-id" value="">
 
           <!-- Upload / URL da Imagem -->
@@ -554,7 +554,7 @@
           <!-- Ficha Técnica (Specs em Pills) -->
           <div class="space-y-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
             <label class="block text-xs font-bold text-slate-700">Ficha Técnica / Tags de Destaque (Specs)</label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-1.5">
               <input type="text" id="product-spec-1" class="text-xs px-2 py-1 border border-slate-300 rounded" placeholder="Tag 1 (Ex: 19 polegadas)">
               <input type="text" id="product-spec-2" class="text-xs px-2 py-1 border border-slate-300 rounded" placeholder="Tag 2 (Ex: LED HD 60Hz)">
               <input type="text" id="product-spec-3" class="text-xs px-2 py-1 border border-slate-300 rounded" placeholder="Tag 3 (Ex: Resposta 5ms)">
@@ -627,8 +627,48 @@
 
     </section>
 
-    <!-- COLUNA DA DIREITA: CANVAS DE PRÉ-VISUALIZAÇÃO (7 cols) -->
-    <section class="lg:col-span-7 flex flex-col gap-4">
+    <!-- COLUNA CENTRAL: VISUALIZAÇÃO AO VIVO -->
+    <section class="flex flex-col gap-4 min-w-0">
+      <div id="contrast-status" class="no-print text-[11px] text-slate-600 flex items-center gap-2" role="status" aria-live="polite"><i data-lucide="eye" class="w-3.5 h-3.5"></i><span>Contraste automático de textos ativado.</span></div>
+      <p id="image-export-status" class="text-xs text-slate-600 no-print" role="status" aria-live="polite"></p>
+      <div class="sticky top-20">
+        
+        <!-- BARRA SUPERIOR DA PRÉVIA -->
+        <div class="flex items-center justify-between mb-3 no-print">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Visualização ao Vivo</span>
+          </div>
+          <div class="text-xs text-slate-500 font-medium">
+            Formato: <span id="current-layout-label" class="font-extrabold text-slate-800">Catalog Grid Infomaq</span>
+          </div>
+        </div>
+
+        <!-- Um produto por panfleto Story Diagonal, sem remover os demais da lista -->
+        <div id="story-product-selector" class="hidden no-print mb-3 bg-sky-50 border border-sky-200 rounded-xl px-3 py-3">
+          <label for="story-product-select" class="block text-xs font-bold text-sky-900 mb-1">Story Diagonal: produto exibido (1 por vez)</label>
+          <select id="story-product-select" onchange="chooseStoryProduct(this.value)" class="w-full rounded-lg border border-sky-300 bg-white px-3 py-2 text-sm text-slate-900"></select>
+          <p class="text-[11px] text-sky-800 mt-1">Troque o produto aqui. A lista e os produtos salvos permanecem intactos.</p>
+        </div>
+
+        <!-- CONTAINER DO PANFLETO -->
+        <div class="bg-slate-800 p-2 sm:p-4 rounded-2xl shadow-2xl overflow-x-auto flex justify-center">
+          
+          <div id="flyer-preview-container" class="w-full max-w-[650px] min-h-[880px] bg-black text-white rounded-lg shadow-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 relative border border-slate-800">
+            
+            <!-- ÁREA DINÂMICA DO PANFLETO -->
+            <div id="flyer-dynamic-canvas" class="w-full h-full flex-1 flex flex-col justify-between">
+              <!-- Conteúdo injetado inteiramente via JS conforme a Paleta + Layout selecionados -->
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- COLUNA DA DIREITA: PERSONALIZAÇÃO VISUAL AVANÇADA -->
+    <section id="pf-right-panel" class="lg:col-span-2 xl:col-span-1 no-print min-w-0 xl:sticky xl:top-20 xl:self-start xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto">
       <!-- EDITOR DE ELEMENTOS DO PANFLETO -->
       <div class="bg-white rounded-2xl border border-slate-200 p-4 no-print space-y-3">
         <div class="flex items-center justify-between gap-2 flex-wrap">
@@ -800,42 +840,6 @@
             <p id="pf-v7-status" class="pf-v7-help" role="status" aria-live="polite">Alterações visuais acompanham o projeto e o arquivo de modelo JSON.</p>
           </div>
         </div>
-      </div>
-      <div id="contrast-status" class="no-print text-[11px] text-slate-600 flex items-center gap-2" role="status" aria-live="polite"><i data-lucide="eye" class="w-3.5 h-3.5"></i><span>Contraste automático de textos ativado.</span></div>
-      <p id="image-export-status" class="text-xs text-slate-600 no-print" role="status" aria-live="polite"></p>
-      <div class="sticky top-20">
-        
-        <!-- BARRA SUPERIOR DA PRÉVIA -->
-        <div class="flex items-center justify-between mb-3 no-print">
-          <div class="flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Visualização ao Vivo</span>
-          </div>
-          <div class="text-xs text-slate-500 font-medium">
-            Formato: <span id="current-layout-label" class="font-extrabold text-slate-800">Catalog Grid Infomaq</span>
-          </div>
-        </div>
-
-        <!-- Um produto por panfleto Story Diagonal, sem remover os demais da lista -->
-        <div id="story-product-selector" class="hidden no-print mb-3 bg-sky-50 border border-sky-200 rounded-xl px-3 py-3">
-          <label for="story-product-select" class="block text-xs font-bold text-sky-900 mb-1">Story Diagonal: produto exibido (1 por vez)</label>
-          <select id="story-product-select" onchange="chooseStoryProduct(this.value)" class="w-full rounded-lg border border-sky-300 bg-white px-3 py-2 text-sm text-slate-900"></select>
-          <p class="text-[11px] text-sky-800 mt-1">Troque o produto aqui. A lista e os produtos salvos permanecem intactos.</p>
-        </div>
-
-        <!-- CONTAINER DO PANFLETO -->
-        <div class="bg-slate-800 p-2 sm:p-4 rounded-2xl shadow-2xl overflow-x-auto flex justify-center">
-          
-          <div id="flyer-preview-container" class="w-full max-w-[650px] min-h-[880px] bg-black text-white rounded-lg shadow-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 relative border border-slate-800">
-            
-            <!-- ÁREA DINÂMICA DO PANFLETO -->
-            <div id="flyer-dynamic-canvas" class="w-full h-full flex-1 flex flex-col justify-between">
-              <!-- Conteúdo injetado inteiramente via JS conforme a Paleta + Layout selecionados -->
-            </div>
-
-          </div>
-        </div>
-
       </div>
     </section>
 
@@ -3093,6 +3097,7 @@ function backgroundColorSamples(el, flyerRoot) {
   }
   return samples.length ? samples.concat(base) : [base];
 }
+const PF_LAYOUTS_SEM_PAINEL_ESCURO = new Set(['showroom-tech', 'feirao-eletro']);
 function auditFlyerTextContrast() {
   const canvas = document.getElementById('flyer-dynamic-canvas');
   const root = document.getElementById('flyer-preview-container');
@@ -3136,6 +3141,9 @@ function auditFlyerTextContrast() {
     if (samples.every(bg => contrastRatio(normal, bg) >= required)) continue;
     const blackScore = Math.min(...samples.map(bg => contrastRatio(BLACK_BG, bg)));
     const whiteScore = Math.min(...samples.map(bg => contrastRatio(WHITE_BG, bg)));
+    // Showroom Tech e Queima Eletro têm fundos próprios definidos no layout:
+    // não aplicar o painel escuro único (#0f172a) sobre os textos.
+    if (!(blackScore >= required || whiteScore >= required) && PF_LAYOUTS_SEM_PAINEL_ESCURO.has(currentLayoutFormat)) continue;
     el.dataset.pfContrastOriginal = el.style.color || '#none#';
     if (blackScore >= required || whiteScore >= required) {
       el.style.color = whiteScore >= blackScore ? '#ffffff' : '#000000';
@@ -3427,7 +3435,7 @@ function initCollapsibleSections() {
     const title = h2.textContent.trim().replace(/\s+/g, ' ');
     makePanelCollapsible(card, PF_LEFT_PANEL_IDS[index], header, title);
   });
-  const editorCard = document.querySelector('main > section:nth-of-type(2) > div.bg-white');
+  const editorCard = document.querySelector('#pf-right-panel > div.bg-white');
   if (editorCard) {
     const header = editorCard.children[0];
     makePanelCollapsible(editorCard, 'visual-editor', header, 'Personalização visual avançada');
