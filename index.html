@@ -160,6 +160,47 @@
         display: none !important;
       }
     }
+
+    /* ===== Menu superior e pop-ups (v8.3) ===== */
+    .pf-nav { display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
+    .pf-menu { position:relative; }
+    .pf-menu-btn { display:inline-flex; align-items:center; gap:7px; padding:8px 12px; border-radius:10px; font-size:13px; font-weight:700;
+      color:#e2e8f0; background:transparent; border:1px solid transparent; cursor:pointer; transition:background .15s,border-color .15s; }
+    .pf-menu-btn:hover, .pf-menu.pf-open > .pf-menu-btn { background:#1e293b; border-color:#334155; }
+    .pf-menu-btn:focus-visible, .pf-menu-item:focus-visible, .pf-modal-close:focus-visible { outline:3px solid #f59e0b; outline-offset:2px; }
+    .pf-menu-btn .pf-chev { width:14px; height:14px; transition:transform .15s; }
+    .pf-menu.pf-open > .pf-menu-btn .pf-chev { transform:rotate(180deg); }
+    .pf-menu-list { position:absolute; top:calc(100% + 6px); left:0; z-index:60; display:none; min-width:260px; max-width:calc(100vw - 24px);
+      padding:6px; background:#fff; color:#0f172a; border:1px solid #cbd5e1; border-radius:14px; box-shadow:0 18px 40px rgba(15,23,42,.35); }
+    .pf-menu.pf-open > .pf-menu-list { display:block; }
+    .pf-menu-item { display:flex; align-items:center; gap:10px; width:100%; padding:9px 10px; border-radius:9px; text-align:left;
+      font-size:13px; font-weight:600; color:#1e293b; background:transparent; border:0; cursor:pointer; }
+    .pf-menu-item:hover { background:#f1f5f9; }
+    .pf-menu-item:disabled { opacity:.5; cursor:not-allowed; }
+    .pf-menu-item i, .pf-menu-item svg { width:16px; height:16px; flex-shrink:0; color:#d97706; }
+    .pf-menu-item.pf-danger { color:#b91c1c; } .pf-menu-item.pf-danger:hover { background:#fef2f2; } .pf-menu-item.pf-danger svg { color:#dc2626; }
+    .pf-menu-item.pf-primary svg { color:#0284c7; }
+    .pf-menu-sep { height:1px; margin:5px 4px; background:#e2e8f0; }
+    @media (max-width: 640px) {
+      .pf-menu { position:static; }
+      .pf-menu-list { left:12px; right:12px; min-width:0; }
+    }
+    .pf-modal { position:fixed; inset:0; z-index:9000; display:none; align-items:flex-start; justify-content:center; padding:4vh 12px;
+      background:rgba(15,23,42,.62); backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px); overflow-y:auto; overscroll-behavior:contain; }
+    .pf-modal.pf-modal-open { display:flex; }
+    .pf-modal-box { width:min(560px,100%); max-height:92vh; display:flex; flex-direction:column; background:#f8fafc;
+      border:1px solid #cbd5e1; border-radius:18px; box-shadow:0 30px 70px rgba(0,0,0,.45); overflow:hidden; }
+    .pf-modal.pf-modal-wide .pf-modal-box { width:min(760px,100%); }
+    .pf-modal-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; background:#0f172a; color:#fff; flex-shrink:0; }
+    .pf-modal-title { font-size:15px; font-weight:800; font-family:Montserrat,Inter,sans-serif; }
+    .pf-modal-close { width:34px; height:34px; border-radius:10px; border:1px solid #334155; background:#1e293b; color:#e2e8f0; font-size:15px; font-weight:800; cursor:pointer; }
+    .pf-modal-close:hover { background:#334155; }
+    .pf-modal-body { padding:12px; overflow-y:auto; overscroll-behavior:contain; }
+    .pf-modal-body > .bg-white { box-shadow:none; }
+    html.pf-modal-lock { overflow:hidden; }
+    @keyframes pfFlash { 0%,100% { box-shadow:0 0 0 0 rgba(245,158,11,0); } 30% { box-shadow:0 0 0 4px rgba(245,158,11,.6); } }
+    .pf-flash { animation:pfFlash 1.4s ease; }
+    @media print { .pf-modal, .pf-nav { display:none !important; } }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-white">
@@ -191,25 +232,36 @@
         </div>
       </div>
 
-      <!-- Ações rápidas do Header -->
-      <div class="flex flex-wrap items-center gap-2">
-        <button onclick="loadSampleData()" class="text-xs sm:text-sm font-medium px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
-          <i data-lucide="rotate-ccw" class="w-4 h-4 text-amber-400"></i>
-          <span class="hidden sm:inline">Carregar Infomaq Exemplo</span>
-        </button>
-        <button onclick="clearAllProducts()" class="text-xs sm:text-sm font-medium px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-red-950/40 text-red-400 border border-slate-700 hover:border-red-800 transition flex items-center gap-1.5">
-          <i data-lucide="trash-2" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Limpar Tudo</span>
-        </button>
-        <button id="btn-export-png" type="button" onclick="exportFlyerPng()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-3 py-2 rounded-lg transition flex items-center gap-2">
-          <i data-lucide="image-down" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Salvar PNG</span><span class="sm:hidden">PNG</span>
-        </button>
-        <button id="btn-export-pdf" type="button" onclick="exportFlyerPdf()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-4 py-2 rounded-lg shadow-lg shadow-amber-500/20 transition flex items-center gap-2">
-          <i data-lucide="printer" class="w-4 h-4"></i>
-          <span>Imprimir / PDF</span>
-        </button>
-      </div>
+      <!-- Menu principal -->
+      <nav class="pf-nav" id="pf-nav" aria-label="Menu principal">
+        <div class="pf-menu">
+          <button type="button" class="pf-menu-btn" data-pf-menu-toggle aria-haspopup="true" aria-expanded="false"><i data-lucide="folder-open" class="w-4 h-4 text-amber-400"></i><span>Arquivo</span><i data-lucide="chevron-down" class="pf-chev"></i></button>
+          <div class="pf-menu-list" role="menu" aria-label="Arquivo">
+            <button type="button" role="menuitem" class="pf-menu-item " data-pf-modal="pf-modal-project"><i data-lucide="save"></i><span>Projeto Local</span></button>
+            <button type="button" role="menuitem" class="pf-menu-item " data-pf-modal="pf-modal-templates"><i data-lucide="layout-template"></i><span>Meus Modelos de Layout</span></button>
+            <div class="pf-menu-sep" role="separator"></div>
+            <button type="button" role="menuitem" class="pf-menu-item" onclick="loadSampleData()"><i data-lucide="rotate-ccw"></i><span>Carregar Infomaq Exemplo</span></button>
+            <button type="button" role="menuitem" class="pf-menu-item pf-danger" onclick="clearAllProducts()"><i data-lucide="trash-2"></i><span>Limpar Tudo</span></button>
+            <div class="pf-menu-sep" role="separator"></div>
+            <button id="btn-export-png" type="button" role="menuitem" class="pf-menu-item pf-primary" onclick="exportFlyerPng()"><i data-lucide="image-down"></i><span>Salvar PNG</span></button>
+            <button id="btn-export-pdf" type="button" role="menuitem" class="pf-menu-item" onclick="exportFlyerPdf()"><i data-lucide="printer"></i><span>Imprimir / PDF</span></button>
+          </div>
+        </div>
+        <div class="pf-menu">
+          <button type="button" class="pf-menu-btn" data-pf-menu-toggle aria-haspopup="true" aria-expanded="false"><i data-lucide="palette" class="w-4 h-4 text-amber-400"></i><span>Panfleto</span><i data-lucide="chevron-down" class="pf-chev"></i></button>
+          <div class="pf-menu-list" role="menu" aria-label="Panfleto">
+            <button type="button" role="menuitem" class="pf-menu-item " data-pf-modal="pf-modal-layout"><i data-lucide="layout-grid"></i><span>Layout, Paleta e Loja</span></button>
+            <button type="button" role="menuitem" class="pf-menu-item " data-pf-modal="pf-modal-gifts"><i data-lucide="gift"></i><span>Brindes</span></button>
+          </div>
+        </div>
+        <div class="pf-menu">
+          <button type="button" class="pf-menu-btn" data-pf-menu-toggle aria-haspopup="true" aria-expanded="false"><i data-lucide="package" class="w-4 h-4 text-amber-400"></i><span>Produtos</span><i data-lucide="chevron-down" class="pf-chev"></i></button>
+          <div class="pf-menu-list" role="menu" aria-label="Produtos">
+            <button type="button" role="menuitem" class="pf-menu-item " data-pf-goto="pf-products-card"><i data-lucide="pencil"></i><span>Editar Produtos e Inseridos</span></button>
+            <button type="button" role="menuitem" class="pf-menu-item " data-pf-modal="pf-modal-library"><i data-lucide="library"></i><span>Biblioteca de Produtos</span></button>
+          </div>
+        </div>
+      </nav>
     </div>
   </header>
 
@@ -219,348 +271,24 @@
     <!-- COLUNA DA ESQUERDA: PAINÉIS LATERAIS (compactos) -->
     <section class="space-y-3 no-print min-w-0">
       
-      <!-- PROJETO LOCAL -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <!-- PRODUTOS: "Editar Produtos" + "Produtos Inseridos" em uma única seção -->
+      <div id="pf-products-card" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center justify-between">
           <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-            <i data-lucide="save" class="w-4 h-4 text-emerald-600"></i>
-            Projeto Local
+            <i data-lucide="package" class="w-4 h-4 text-amber-500"></i>
+            Produtos
           </h2>
-          <span class="text-[11px] text-slate-500 font-semibold">Salvamento automático</span>
-        </div>
-        <div class="p-3 space-y-3">
-          <p class="text-xs text-slate-600">Suas alterações ficam salvas no navegador deste dispositivo e são restauradas ao abrir novamente a aplicação.</p>
-          <div class="flex flex-wrap gap-2">
-            <button type="button" onclick="saveProjectNow()" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5">
-              <i data-lucide="save" class="w-3.5 h-3.5"></i>
-              Salvar agora
-            </button>
-            <button type="button" onclick="restoreProjectFromLocal()" class="px-3 py-2 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-300 transition flex items-center gap-1.5">
-              <i data-lucide="history" class="w-3.5 h-3.5"></i>
-              Restaurar
-            </button>
-            <button type="button" onclick="clearSavedProject()" class="px-3 py-2 rounded-lg bg-white hover:bg-red-50 text-red-600 text-xs font-semibold border border-red-200 transition flex items-center gap-1.5">
-              <i data-lucide="database-zap" class="w-3.5 h-3.5"></i>
-              Apagar cópia local
-            </button>
-          </div>
-          <p id="save-status" class="text-[11px] text-slate-500" role="status" aria-live="polite">Nenhuma alteração local restaurada ainda.</p>
-        </div>
-      </div>
-      
-      <!-- MODELOS PERSONALIZADOS -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center gap-2">
-          <i data-lucide="copy-plus" class="w-4 h-4 text-violet-600"></i>
-          <h2 class="text-sm font-bold text-slate-800">Meus Modelos de Layout</h2>
-        </div>
-        <div class="p-3 space-y-3">
-          <p class="text-xs text-slate-500">Salve o modelo em um <strong>arquivo JSON</strong> para usar em outro computador ou celular. O arquivo inclui as fontes, cores, fundos, posições, dimensões, rotações, textos inseridos e o logo carregado.</p>
-          <label for="saved-template-select" class="text-xs font-bold text-slate-700">Modelos salvos</label>
-          <select id="saved-template-select" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"><option value="">Selecione um modelo</option></select>
-          <div class="flex flex-wrap gap-2">
-            <button type="button" onclick="duplicateCurrentLayout()" class="bg-violet-600 hover:bg-violet-700 text-white px-3 py-2 rounded-lg text-xs font-bold">Duplicar layout</button>
-            <button type="button" onclick="saveAsTemplate()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Salvar como modelo (.json)</button>
-            <button type="button" onclick="exportSelectedTemplateFile()" class="bg-white border border-violet-200 text-violet-800 px-3 py-2 rounded-lg text-xs font-semibold">Baixar modelo selecionado</button>
-            <button type="button" onclick="document.getElementById('template-import-file').click()" class="bg-white border border-emerald-200 text-emerald-800 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Importar modelo</button>
-            <button type="button" onclick="loadSelectedTemplate()" class="bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold">Carregar</button>
-            <button type="button" onclick="deleteSelectedTemplate()" class="bg-white border border-red-200 text-red-700 px-3 py-2 rounded-lg text-xs font-semibold">Excluir</button>
-          </div>
-          <input type="file" id="template-import-file" accept=".json,application/json" class="sr-only" aria-label="Selecionar arquivo de modelo JSON" onchange="importTemplateFile(event)">
-          <div class="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
-            <label class="flex items-start gap-2 text-xs text-slate-700 cursor-pointer">
-              <input id="template-include-products" type="checkbox" checked class="mt-0.5 accent-violet-700">
-              <span><strong>Incluir produtos no arquivo</strong> para reproduzir a mesma arte em outro dispositivo (imagens locais são incorporadas ao JSON).</span>
-            </label>
-            <label class="flex items-start gap-2 text-xs text-slate-700 cursor-pointer">
-              <input id="template-import-products" type="checkbox" checked class="mt-0.5 accent-emerald-700">
-              <span><strong>Restaurar produtos do arquivo ao importar.</strong> A substituição dos produtos atuais exige confirmação.</span>
-            </label>
-            <p class="text-[11px] text-slate-500">Se desmarcar a restauração de produtos, serão mantidos os atuais; os ajustes de imagens associados a produtos específicos podem não coincidir. Imagens por links externos ainda dependem de acesso à internet.</p>
-          </div>
-          <p id="template-status" class="text-[11px] text-slate-500" role="status" aria-live="polite">Nenhum modelo personalizado selecionado.</p>
-        </div>
-      </div>
-
-      <!-- CONFIGURAÇÕES DE LAYOUT & PALETAS -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-5 py-4 flex justify-between items-center">
-          <h2 class="font-bold text-slate-800 text-base flex items-center gap-2">
-            <i data-lucide="sliders" class="w-5 h-5 text-amber-500"></i>
-            1. Formato de Layout & Tema
-          </h2>
-          <span class="text-xs font-semibold text-slate-500">Passo 1 de 4</span>
+          <span class="text-[11px] text-slate-500 font-semibold">Editar e inseridos</span>
         </div>
 
-        <div class="p-3 space-y-5">
-          <!-- 1. TIPO DE LAYOUT -->
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center justify-between">
-              <span>Modelo do Panfleto</span>
-              <span class="text-[10px] text-amber-700 bg-amber-50 font-extrabold px-1.5 py-0.5 rounded">8 Formatos</span>
-            </label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2">
-              <button type="button" onclick="setLayoutFormat('infomaq-catalog')" id="layout-btn-infomaq-catalog" class="layout-btn p-2 rounded-xl border-2 border-amber-500 bg-amber-50 text-slate-900 text-xs font-extrabold flex flex-col items-center gap-1 transition">
-                <i data-lucide="grid-3x3" class="w-5 h-5 text-amber-600"></i>
-                <span class="text-[11px]">Infomaq Grid</span>
-              </button>
-              <button type="button" onclick="setLayoutFormat('infomaq-single')" id="layout-btn-infomaq-single" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
-                <i data-lucide="award" class="w-5 h-5 text-red-600"></i>
-                <span class="text-[11px]">Infomaq Hero</span>
-              </button>
-              <button type="button" onclick="setLayoutFormat('grid')" id="layout-btn-grid" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
-                <i data-lucide="grid" class="w-5 h-5 text-blue-600"></i>
-                <span class="text-[11px]">Encarte Varejo</span>
-              </button>
-              <button type="button" onclick="setLayoutFormat('story-diagonal')" id="layout-btn-story-diagonal" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
-                <i data-lucide="layout-template" class="w-5 h-5 text-sky-600"></i>
-                <span class="text-[11px]">Story Diagonal</span>
-              </button>
-              <button type="button" onclick="setLayoutFormat('dark-neon')" id="layout-btn-dark-neon" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
-                <i data-lucide="zap" class="w-5 h-5 text-emerald-500"></i>
-                <span class="text-[11px]">Dark Neon</span>
-              </button>
-              <button type="button" onclick="setLayoutFormat('showroom-tech')" id="layout-btn-showroom-tech" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
-                <i data-lucide="tv" class="w-5 h-5 text-indigo-600"></i>
-                <span class="text-[11px]">Showroom Tech</span>
-              </button>
-              <button type="button" onclick="setLayoutFormat('premium-minimal')" id="layout-btn-premium-minimal" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
-                <i data-lucide="sparkles" class="w-5 h-5 text-amber-500"></i>
-                <span class="text-[11px]">Minimal Tech</span>
-              </button>
-              <button type="button" onclick="setLayoutFormat('feirao-eletro')" id="layout-btn-feirao-eletro" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
-                <i data-lucide="flame" class="w-5 h-5 text-orange-600"></i>
-                <span class="text-[11px]">Queima Eletro</span>
-              </button>
-            </div>
+        <div id="pf-products-edit-block">
+          <div class="px-3 pt-3 flex items-center gap-2">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i data-lucide="plus-circle" class="w-4 h-4 text-amber-500"></i>
+              <span id="form-title">Adicionar Produto</span>
+            </h3>
           </div>
-
-          <!-- 2. SELETOR DE PALETAS DE CORES -->
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Paletas de Cores Dinâmicas</label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2">
-              <button type="button" onclick="setPalette('black-gold')" id="palette-btn-black-gold" class="palette-btn p-2 rounded-xl border-2 border-amber-500 bg-slate-900 text-white text-[11px] font-bold flex items-center gap-2 transition">
-                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-amber-400 via-red-600 to-black border border-white shrink-0"></span>
-                <span class="truncate">Black & Gold</span>
-              </button>
-              <button type="button" onclick="setPalette('retail-red')" id="palette-btn-retail-red" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
-                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-red-600 via-yellow-400 to-red-700 border border-slate-300 shrink-0"></span>
-                <span class="truncate">Varejo Red</span>
-              </button>
-              <button type="button" onclick="setPalette('cyber-neon')" id="palette-btn-cyber-neon" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
-                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-emerald-500 via-cyan-400 to-slate-900 border border-slate-300 shrink-0"></span>
-                <span class="truncate">Cyber Neon</span>
-              </button>
-              <button type="button" onclick="setPalette('eletro-blue')" id="palette-btn-eletro-blue" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
-                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-blue-700 via-cyan-400 to-indigo-900 border border-slate-300 shrink-0"></span>
-                <span class="truncate">Eletro Blue</span>
-              </button>
-              <button type="button" onclick="setPalette('hortifruti-green')" id="palette-btn-hortifruti-green" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
-                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-emerald-700 via-amber-400 to-green-900 border border-slate-300 shrink-0"></span>
-                <span class="truncate">Horti Verde</span>
-              </button>
-              <button type="button" onclick="setPalette('purple-tech')" id="palette-btn-purple-tech" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
-                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-purple-700 via-pink-500 to-slate-950 border border-slate-300 shrink-0"></span>
-                <span class="truncate">Purple Tech</span>
-              </button>
-              <button type="button" onclick="setPalette('clean-minimal')" id="palette-btn-clean-minimal" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
-                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-slate-200 via-orange-500 to-slate-800 border border-slate-300 shrink-0"></span>
-                <span class="truncate">Clean Grey</span>
-              </button>
-              <button type="button" onclick="setPalette('fire-orange')" id="palette-btn-fire-orange" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
-                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-orange-600 via-amber-300 to-red-700 border border-slate-300 shrink-0"></span>
-                <span class="truncate">Fire Orange</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- 3. Dados da Loja e Mensagens -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 pt-2 border-t border-slate-100">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Nome da Loja</label>
-              <div class="relative">
-                <input type="text" id="store-name" value="INFOMAQ ELETRO" oninput="updateFlyer()" class="w-full text-sm pl-9 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 font-bold" placeholder="Ex: INFOMAQ ELETRO">
-                <i data-lucide="store" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Título de Destaque / Selo</label>
-              <input type="text" id="promo-badge" value="BLACK FRIDAY" oninput="updateFlyer()" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 font-extrabold uppercase" placeholder="BLACK FRIDAY">
-            </div>
-          </div>
-
-          <!-- LOGO DA LOJA: ARQUIVO LOCAL OU URL (NÃO PRECISA DE SERVIDOR) -->
-          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
-            <label class="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
-              <i data-lucide="image" class="w-4 h-4 text-amber-600"></i>
-              Logo da Loja (opcional)
-            </label>
-            <div class="flex gap-3 items-center">
-              <div id="logo-preview" class="w-20 h-20 bg-white border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden shrink-0" aria-label="Prévia do logo">
-                <i data-lucide="store" class="w-6 h-6 text-slate-400"></i>
-              </div>
-              <div class="flex-1 min-w-0 space-y-2">
-                <input type="file" id="store-logo-file" accept=".png,.jpg,.jpeg,.webp,.gif,image/png,image/jpeg,image/webp,image/gif" onchange="handleLogoUpload(event)" class="sr-only" aria-label="Selecionar arquivo do logo">
-                <div class="flex flex-wrap gap-2">
-                  <button type="button" onclick="document.getElementById('store-logo-file').click()" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition flex items-center gap-1.5">
-                    <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                    Selecionar imagem
-                  </button>
-                  <button type="button" onclick="clearLogo()" class="px-3 py-2 bg-white hover:bg-slate-100 text-slate-600 text-xs font-medium rounded-lg border border-slate-300 transition">
-                    Remover logo
-                  </button>
-                </div>
-                <p class="text-[11px] text-slate-500">PNG, JPG, WEBP ou GIF (até 6 MB). Imagens com fundo transparente são ideais.</p>
-                <p id="logo-status" class="text-[11px] text-slate-600 break-words" role="status" aria-live="polite">Nenhum arquivo selecionado.</p>
-              </div>
-            </div>
-            <div>
-              <label for="store-logo-url" class="block text-[11px] font-semibold text-slate-600 mb-1">Ou use um link de imagem</label>
-              <input type="url" id="store-logo-url" oninput="handleLogoUrlInput()" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg text-slate-600" placeholder="https://exemplo.com/minha-logo.png">
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label for="store-logo-mode" class="block text-[11px] font-semibold text-slate-600 mb-1">Exibição no panfleto</label>
-                <select id="store-logo-mode" onchange="updateFlyer()" class="w-full text-xs p-2 border border-slate-300 rounded-lg bg-white">
-                  <option value="both">Logo e nome</option>
-                  <option value="logo">Somente logo</option>
-                  <option value="name">Somente nome</option>
-                </select>
-              </div>
-              <div>
-                <label for="store-logo-size" class="block text-[11px] font-semibold text-slate-600 mb-1">Tamanho do logo</label>
-                <select id="store-logo-size" onchange="updateFlyer()" class="w-full text-xs p-2 border border-slate-300 rounded-lg bg-white">
-                  <option value="small">Pequeno</option>
-                  <option value="medium" selected>Médio</option>
-                  <option value="large">Grande</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <!-- Subtítulo e Tagline -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Subtítulo / Tagline</label>
-              <input type="text" id="store-tagline" value="Celulares com preço especial e brindes na compra." oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="Ex: Tecnologia com preço especial">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Faixa de Aviso Topo</label>
-              <input type="text" id="store-validity" value="CONFIRA NOSSAS OFERTAS POR TEMPO LIMITADO" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="Aviso de validade">
-            </div>
-          </div>
-
-          <!-- Contatos & Redes Sociais -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">WhatsApp / Telefone</label>
-              <input type="text" id="store-phone" value="66 8134-3028" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="66 9999-0000">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Instagram</label>
-              <input type="text" id="store-social" value="@infomaq_eletro" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="@sualoja">
-            </div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
-            <div>
-              <label for="store-facebook" class="block text-xs font-semibold text-slate-600 mb-1">Facebook (opcional)</label>
-              <input type="text" id="store-facebook" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="facebook.com/sualoja">
-            </div>
-            <div>
-              <label for="store-youtube" class="block text-xs font-semibold text-slate-600 mb-1">YouTube (opcional)</label>
-              <input type="text" id="store-youtube" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="@canaldaloja">
-            </div>
-            <div>
-              <label for="store-tiktok" class="block text-xs font-semibold text-slate-600 mb-1">TikTok (opcional)</label>
-              <input type="text" id="store-tiktok" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="@loja">
-            </div>
-            <div>
-              <label for="store-site" class="block text-xs font-semibold text-slate-600 mb-1">Site (opcional)</label>
-              <input type="text" id="store-site" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="minhaloja.com.br">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SEÇÃO DE CONFIGURAÇÃO DE BRINDES (NOVO) -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div id="gift-section-header" class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex justify-between items-center cursor-pointer" onclick="toggleGiftsSection()">
-          <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-            <i data-lucide="gift" class="w-4 h-4 text-red-600"></i>
-            2. Configurar Seção de Brindes Promocionais
-          </h2>
-          <div class="flex items-center gap-2">
-            <input type="checkbox" id="gifts-enabled" checked onchange="handleGiftPreferenceChange()" class="rounded text-amber-500 focus:ring-amber-500 w-4 h-4" onclick="event.stopPropagation()">
-            <span class="text-xs font-semibold text-slate-600">Ativar</span>
-          </div>
-        </div>
-
-        <p id="gifts-disabled-message" class="hidden px-4 py-3 text-xs font-semibold text-slate-500 bg-slate-50">Este layout não possui área de brindes. A seção foi desativada automaticamente.</p>
-        <div id="gifts-panel" class="p-3 space-y-3 bg-amber-50/30">
-          <p class="text-[11px] text-slate-500">Exibido na parte inferior dos layouts Infomaq. Personalize a frase e até 3 itens:</p>
-          
-          <div>
-            <label class="block text-[11px] font-bold text-slate-700 mb-1">Chamada dos Brindes</label>
-            <input type="text" id="gifts-title" value="Comprando seu celular conosco você ganha brindes: película, capinha e uma faca para churrasco." oninput="updateFlyer()" class="w-full text-xs px-3 py-1.5 border border-slate-300 rounded-lg font-medium">
-          </div>
-
-          <div class="grid grid-cols-3 gap-2">
-            <div class="bg-white p-2 rounded-lg border border-slate-200 text-center space-y-1">
-              <span class="text-[10px] font-bold text-amber-700 block">Brinde 1</span>
-              <input type="text" id="gift-1-name" value="Película" oninput="updateFlyer()" class="w-full text-[11px] px-1.5 py-1 border rounded text-center font-bold">
-              <input type="text" id="gift-1-img" value="https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=200&q=80" oninput="updateFlyer()" class="w-full text-[9px] px-1 py-0.5 border rounded text-slate-400" placeholder="URL Imagem">
-            </div>
-            <div class="bg-white p-2 rounded-lg border border-slate-200 text-center space-y-1">
-              <span class="text-[10px] font-bold text-amber-700 block">Brinde 2</span>
-              <input type="text" id="gift-2-name" value="Capinha" oninput="updateFlyer()" class="w-full text-[11px] px-1.5 py-1 border rounded text-center font-bold">
-              <input type="text" id="gift-2-img" value="https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=200&q=80" oninput="updateFlyer()" class="w-full text-[9px] px-1 py-0.5 border rounded text-slate-400" placeholder="URL Imagem">
-            </div>
-            <div class="bg-white p-2 rounded-lg border border-slate-200 text-center space-y-1">
-              <span class="text-[10px] font-bold text-amber-700 block">Brinde 3</span>
-              <input type="text" id="gift-3-name" value="Faca para churrasco" oninput="updateFlyer()" class="w-full text-[11px] px-1.5 py-1 border rounded text-center font-bold">
-              <input type="text" id="gift-3-img" value="https://images.unsplash.com/photo-1593618998160-e34014e67546?auto=format&fit=crop&w=200&q=80" oninput="updateFlyer()" class="w-full text-[9px] px-1 py-0.5 border rounded text-slate-400" placeholder="URL Imagem">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CATÁLOGOS LOCAIS DE PRODUTOS -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center gap-2">
-          <i data-lucide="boxes" class="w-4 h-4 text-sky-600"></i>
-          <h2 class="font-bold text-slate-800 text-sm">Biblioteca de Produtos</h2>
-        </div>
-        <div class="p-3 space-y-3">
-          <p class="text-xs text-slate-500">Guarde conjuntos de produtos para reutilizar em outros panfletos.</p>
-          <label for="product-collection-select" class="text-xs font-bold text-slate-700">Conjunto salvo</label>
-          <select id="product-collection-select" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-300 bg-white">
-            <option value="">Selecione um conjunto</option>
-          </select>
-          <div class="flex flex-wrap gap-2">
-            <button type="button" onclick="saveProductCollection()" class="bg-sky-700 hover:bg-sky-800 text-white px-3 py-2 rounded-lg text-xs font-bold">Salvar produtos</button>
-            <button type="button" onclick="loadProductCollection()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg text-xs font-bold">Carregar produtos</button>
-            <button type="button" onclick="deleteProductCollection()" class="bg-white border border-red-200 text-red-700 px-3 py-2 rounded-lg text-xs font-semibold">Excluir conjunto</button>
-          </div>
-          <div class="flex flex-wrap gap-2 border-t border-slate-100 pt-3">
-            <button type="button" onclick="downloadProductsJson()" class="border border-slate-300 bg-white rounded-lg px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Exportar JSON</button>
-            <button type="button" onclick="document.getElementById('products-json-file').click()" class="border border-slate-300 bg-white rounded-lg px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-1.5"><i data-lucide="file-up" class="w-3.5 h-3.5"></i> Importar JSON</button>
-            <input id="products-json-file" type="file" accept=".json,application/json" class="hidden" onchange="importProductsJson(event)">
-          </div>
-          <p id="product-library-status" class="text-[11px] text-slate-500" role="status" aria-live="polite">Os produtos atuais também participam do salvamento automático.</p>
-        </div>
-      </div>
-
-      <!-- FORMULÁRIO DE INSERÇÃO DE PRODUTO -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-5 py-4 flex justify-between items-center">
-          <h2 class="font-bold text-slate-800 text-base flex items-center gap-2">
-            <i data-lucide="plus-circle" class="w-5 h-5 text-amber-500"></i>
-            <span id="form-title">3. Adicionar Produto</span>
-          </h2>
-          <span class="text-xs font-semibold text-slate-500">Passo 3 de 4</span>
-        </div>
-
-        <form id="product-form" onsubmit="handleProductSubmit(event)" class="p-3 space-y-4">
+          <form id="product-form" onsubmit="handleProductSubmit(event)" class="p-3 space-y-4">
           <input type="hidden" id="product-edit-id" value="">
 
           <!-- Upload / URL da Imagem -->
@@ -661,20 +389,16 @@
             </button>
           </div>
         </form>
-      </div>
-
-      <!-- LISTA DE PRODUTOS ADICIONADOS -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="bg-slate-50 border-b border-slate-200 px-5 py-4 flex justify-between items-center">
-          <div class="flex items-center gap-2">
-            <h2 class="font-bold text-slate-800 text-base">4. Produtos Inseridos</h2>
-            <span id="product-count-badge" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded-full">0 itens</span>
-          </div>
-          <span class="text-xs font-semibold text-slate-500">Passo 4 de 4</span>
         </div>
 
-        <div id="products-list" class="divide-y divide-slate-100 max-h-80 overflow-y-auto">
+        <div id="pf-products-list-block" class="border-t border-slate-200">
+          <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex justify-between items-center gap-2">
+            <h3 class="font-bold text-slate-800 text-sm">Produtos Inseridos</h3>
+            <span id="product-count-badge" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-0.5 rounded-full">0 itens</span>
+          </div>
+          <div id="products-list" class="divide-y divide-slate-100 max-h-80 overflow-y-auto">
           <!-- Lista dinâmica inserida via JS -->
+        </div>
         </div>
       </div>
 
@@ -908,6 +632,384 @@
     </section>
 
   </main>
+
+  <!-- POP-UPS DO MENU SUPERIOR -->
+  <div id="pf-modal-project" class="pf-modal no-print" aria-hidden="true">
+    <div class="pf-modal-box" role="dialog" aria-modal="true" aria-labelledby="pf-modal-project-title">
+      <div class="pf-modal-head">
+        <span class="pf-modal-title" id="pf-modal-project-title">Projeto Local</span>
+        <button type="button" class="pf-modal-close" data-pf-modal-close aria-label="Fechar Projeto Local"><span aria-hidden="true">✕</span></button>
+      </div>
+      <div class="pf-modal-body">
+      <!-- PROJETO LOCAL -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center justify-between">
+          <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+            <i data-lucide="save" class="w-4 h-4 text-emerald-600"></i>
+            Projeto Local
+          </h2>
+          <span class="text-[11px] text-slate-500 font-semibold">Salvamento automático</span>
+        </div>
+        <div class="p-3 space-y-3">
+          <p class="text-xs text-slate-600">Suas alterações ficam salvas no navegador deste dispositivo e são restauradas ao abrir novamente a aplicação.</p>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" onclick="saveProjectNow()" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5">
+              <i data-lucide="save" class="w-3.5 h-3.5"></i>
+              Salvar agora
+            </button>
+            <button type="button" onclick="restoreProjectFromLocal()" class="px-3 py-2 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-300 transition flex items-center gap-1.5">
+              <i data-lucide="history" class="w-3.5 h-3.5"></i>
+              Restaurar
+            </button>
+            <button type="button" onclick="clearSavedProject()" class="px-3 py-2 rounded-lg bg-white hover:bg-red-50 text-red-600 text-xs font-semibold border border-red-200 transition flex items-center gap-1.5">
+              <i data-lucide="database-zap" class="w-3.5 h-3.5"></i>
+              Apagar cópia local
+            </button>
+          </div>
+          <p id="save-status" class="text-[11px] text-slate-500" role="status" aria-live="polite">Nenhuma alteração local restaurada ainda.</p>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div id="pf-modal-templates" class="pf-modal no-print" aria-hidden="true">
+    <div class="pf-modal-box" role="dialog" aria-modal="true" aria-labelledby="pf-modal-templates-title">
+      <div class="pf-modal-head">
+        <span class="pf-modal-title" id="pf-modal-templates-title">Meus Modelos de Layout</span>
+        <button type="button" class="pf-modal-close" data-pf-modal-close aria-label="Fechar Meus Modelos de Layout"><span aria-hidden="true">✕</span></button>
+      </div>
+      <div class="pf-modal-body">
+      <!-- MODELOS PERSONALIZADOS -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center gap-2">
+          <i data-lucide="copy-plus" class="w-4 h-4 text-violet-600"></i>
+          <h2 class="text-sm font-bold text-slate-800">Meus Modelos de Layout</h2>
+        </div>
+        <div class="p-3 space-y-3">
+          <p class="text-xs text-slate-500">Salve o modelo em um <strong>arquivo JSON</strong> para usar em outro computador ou celular. O arquivo inclui as fontes, cores, fundos, posições, dimensões, rotações, textos inseridos e o logo carregado.</p>
+          <label for="saved-template-select" class="text-xs font-bold text-slate-700">Modelos salvos</label>
+          <select id="saved-template-select" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"><option value="">Selecione um modelo</option></select>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" onclick="duplicateCurrentLayout()" class="bg-violet-600 hover:bg-violet-700 text-white px-3 py-2 rounded-lg text-xs font-bold">Duplicar layout</button>
+            <button type="button" onclick="saveAsTemplate()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Salvar como modelo (.json)</button>
+            <button type="button" onclick="exportSelectedTemplateFile()" class="bg-white border border-violet-200 text-violet-800 px-3 py-2 rounded-lg text-xs font-semibold">Baixar modelo selecionado</button>
+            <button type="button" onclick="document.getElementById('template-import-file').click()" class="bg-white border border-emerald-200 text-emerald-800 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Importar modelo</button>
+            <button type="button" onclick="loadSelectedTemplate()" class="bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold">Carregar</button>
+            <button type="button" onclick="deleteSelectedTemplate()" class="bg-white border border-red-200 text-red-700 px-3 py-2 rounded-lg text-xs font-semibold">Excluir</button>
+          </div>
+          <input type="file" id="template-import-file" accept=".json,application/json" class="sr-only" aria-label="Selecionar arquivo de modelo JSON" onchange="importTemplateFile(event)">
+          <div class="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <label class="flex items-start gap-2 text-xs text-slate-700 cursor-pointer">
+              <input id="template-include-products" type="checkbox" checked class="mt-0.5 accent-violet-700">
+              <span><strong>Incluir produtos no arquivo</strong> para reproduzir a mesma arte em outro dispositivo (imagens locais são incorporadas ao JSON).</span>
+            </label>
+            <label class="flex items-start gap-2 text-xs text-slate-700 cursor-pointer">
+              <input id="template-import-products" type="checkbox" checked class="mt-0.5 accent-emerald-700">
+              <span><strong>Restaurar produtos do arquivo ao importar.</strong> A substituição dos produtos atuais exige confirmação.</span>
+            </label>
+            <p class="text-[11px] text-slate-500">Se desmarcar a restauração de produtos, serão mantidos os atuais; os ajustes de imagens associados a produtos específicos podem não coincidir. Imagens por links externos ainda dependem de acesso à internet.</p>
+          </div>
+          <p id="template-status" class="text-[11px] text-slate-500" role="status" aria-live="polite">Nenhum modelo personalizado selecionado.</p>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div id="pf-modal-layout" class="pf-modal no-print pf-modal-wide" aria-hidden="true">
+    <div class="pf-modal-box" role="dialog" aria-modal="true" aria-labelledby="pf-modal-layout-title">
+      <div class="pf-modal-head">
+        <span class="pf-modal-title" id="pf-modal-layout-title">Layout, Paleta e Loja</span>
+        <button type="button" class="pf-modal-close" data-pf-modal-close aria-label="Fechar Layout, Paleta e Loja"><span aria-hidden="true">✕</span></button>
+      </div>
+      <div class="pf-modal-body">
+      <!-- CONFIGURAÇÕES DE LAYOUT & PALETAS -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-slate-50 border-b border-slate-200 px-5 py-4 flex justify-between items-center">
+          <h2 class="font-bold text-slate-800 text-base flex items-center gap-2">
+            <i data-lucide="sliders" class="w-5 h-5 text-amber-500"></i>
+            1. Formato de Layout & Tema
+          </h2>
+          <span class="text-xs font-semibold text-slate-500">Passo 1 de 4</span>
+        </div>
+
+        <div class="p-3 space-y-5">
+          <!-- 1. TIPO DE LAYOUT -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center justify-between">
+              <span>Modelo do Panfleto</span>
+              <span class="text-[10px] text-amber-700 bg-amber-50 font-extrabold px-1.5 py-0.5 rounded">8 Formatos</span>
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2">
+              <button type="button" onclick="setLayoutFormat('infomaq-catalog')" id="layout-btn-infomaq-catalog" class="layout-btn p-2 rounded-xl border-2 border-amber-500 bg-amber-50 text-slate-900 text-xs font-extrabold flex flex-col items-center gap-1 transition">
+                <i data-lucide="grid-3x3" class="w-5 h-5 text-amber-600"></i>
+                <span class="text-[11px]">Infomaq Grid</span>
+              </button>
+              <button type="button" onclick="setLayoutFormat('infomaq-single')" id="layout-btn-infomaq-single" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
+                <i data-lucide="award" class="w-5 h-5 text-red-600"></i>
+                <span class="text-[11px]">Infomaq Hero</span>
+              </button>
+              <button type="button" onclick="setLayoutFormat('grid')" id="layout-btn-grid" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
+                <i data-lucide="grid" class="w-5 h-5 text-blue-600"></i>
+                <span class="text-[11px]">Encarte Varejo</span>
+              </button>
+              <button type="button" onclick="setLayoutFormat('story-diagonal')" id="layout-btn-story-diagonal" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
+                <i data-lucide="layout-template" class="w-5 h-5 text-sky-600"></i>
+                <span class="text-[11px]">Story Diagonal</span>
+              </button>
+              <button type="button" onclick="setLayoutFormat('dark-neon')" id="layout-btn-dark-neon" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
+                <i data-lucide="zap" class="w-5 h-5 text-emerald-500"></i>
+                <span class="text-[11px]">Dark Neon</span>
+              </button>
+              <button type="button" onclick="setLayoutFormat('showroom-tech')" id="layout-btn-showroom-tech" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
+                <i data-lucide="tv" class="w-5 h-5 text-indigo-600"></i>
+                <span class="text-[11px]">Showroom Tech</span>
+              </button>
+              <button type="button" onclick="setLayoutFormat('premium-minimal')" id="layout-btn-premium-minimal" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
+                <i data-lucide="sparkles" class="w-5 h-5 text-amber-500"></i>
+                <span class="text-[11px]">Minimal Tech</span>
+              </button>
+              <button type="button" onclick="setLayoutFormat('feirao-eletro')" id="layout-btn-feirao-eletro" class="layout-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-bold flex flex-col items-center gap-1 transition hover:border-slate-300">
+                <i data-lucide="flame" class="w-5 h-5 text-orange-600"></i>
+                <span class="text-[11px]">Queima Eletro</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. SELETOR DE PALETAS DE CORES -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Paletas de Cores Dinâmicas</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2">
+              <button type="button" onclick="setPalette('black-gold')" id="palette-btn-black-gold" class="palette-btn p-2 rounded-xl border-2 border-amber-500 bg-slate-900 text-white text-[11px] font-bold flex items-center gap-2 transition">
+                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-amber-400 via-red-600 to-black border border-white shrink-0"></span>
+                <span class="truncate">Black & Gold</span>
+              </button>
+              <button type="button" onclick="setPalette('retail-red')" id="palette-btn-retail-red" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
+                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-red-600 via-yellow-400 to-red-700 border border-slate-300 shrink-0"></span>
+                <span class="truncate">Varejo Red</span>
+              </button>
+              <button type="button" onclick="setPalette('cyber-neon')" id="palette-btn-cyber-neon" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
+                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-emerald-500 via-cyan-400 to-slate-900 border border-slate-300 shrink-0"></span>
+                <span class="truncate">Cyber Neon</span>
+              </button>
+              <button type="button" onclick="setPalette('eletro-blue')" id="palette-btn-eletro-blue" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
+                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-blue-700 via-cyan-400 to-indigo-900 border border-slate-300 shrink-0"></span>
+                <span class="truncate">Eletro Blue</span>
+              </button>
+              <button type="button" onclick="setPalette('hortifruti-green')" id="palette-btn-hortifruti-green" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
+                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-emerald-700 via-amber-400 to-green-900 border border-slate-300 shrink-0"></span>
+                <span class="truncate">Horti Verde</span>
+              </button>
+              <button type="button" onclick="setPalette('purple-tech')" id="palette-btn-purple-tech" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
+                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-purple-700 via-pink-500 to-slate-950 border border-slate-300 shrink-0"></span>
+                <span class="truncate">Purple Tech</span>
+              </button>
+              <button type="button" onclick="setPalette('clean-minimal')" id="palette-btn-clean-minimal" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
+                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-slate-200 via-orange-500 to-slate-800 border border-slate-300 shrink-0"></span>
+                <span class="truncate">Clean Grey</span>
+              </button>
+              <button type="button" onclick="setPalette('fire-orange')" id="palette-btn-fire-orange" class="palette-btn p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-[11px] font-bold flex items-center gap-2 transition">
+                <span class="w-4 h-4 rounded-full bg-gradient-to-r from-orange-600 via-amber-300 to-red-700 border border-slate-300 shrink-0"></span>
+                <span class="truncate">Fire Orange</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. Dados da Loja e Mensagens -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 pt-2 border-t border-slate-100">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Nome da Loja</label>
+              <div class="relative">
+                <input type="text" id="store-name" value="INFOMAQ ELETRO" oninput="updateFlyer()" class="w-full text-sm pl-9 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 font-bold" placeholder="Ex: INFOMAQ ELETRO">
+                <i data-lucide="store" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Título de Destaque / Selo</label>
+              <input type="text" id="promo-badge" value="BLACK FRIDAY" oninput="updateFlyer()" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 font-extrabold uppercase" placeholder="BLACK FRIDAY">
+            </div>
+          </div>
+
+          <!-- LOGO DA LOJA: ARQUIVO LOCAL OU URL (NÃO PRECISA DE SERVIDOR) -->
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
+            <label class="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
+              <i data-lucide="image" class="w-4 h-4 text-amber-600"></i>
+              Logo da Loja (opcional)
+            </label>
+            <div class="flex gap-3 items-center">
+              <div id="logo-preview" class="w-20 h-20 bg-white border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden shrink-0" aria-label="Prévia do logo">
+                <i data-lucide="store" class="w-6 h-6 text-slate-400"></i>
+              </div>
+              <div class="flex-1 min-w-0 space-y-2">
+                <input type="file" id="store-logo-file" accept=".png,.jpg,.jpeg,.webp,.gif,image/png,image/jpeg,image/webp,image/gif" onchange="handleLogoUpload(event)" class="sr-only" aria-label="Selecionar arquivo do logo">
+                <div class="flex flex-wrap gap-2">
+                  <button type="button" onclick="document.getElementById('store-logo-file').click()" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition flex items-center gap-1.5">
+                    <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                    Selecionar imagem
+                  </button>
+                  <button type="button" onclick="clearLogo()" class="px-3 py-2 bg-white hover:bg-slate-100 text-slate-600 text-xs font-medium rounded-lg border border-slate-300 transition">
+                    Remover logo
+                  </button>
+                </div>
+                <p class="text-[11px] text-slate-500">PNG, JPG, WEBP ou GIF (até 6 MB). Imagens com fundo transparente são ideais.</p>
+                <p id="logo-status" class="text-[11px] text-slate-600 break-words" role="status" aria-live="polite">Nenhum arquivo selecionado.</p>
+              </div>
+            </div>
+            <div>
+              <label for="store-logo-url" class="block text-[11px] font-semibold text-slate-600 mb-1">Ou use um link de imagem</label>
+              <input type="url" id="store-logo-url" oninput="handleLogoUrlInput()" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg text-slate-600" placeholder="https://exemplo.com/minha-logo.png">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label for="store-logo-mode" class="block text-[11px] font-semibold text-slate-600 mb-1">Exibição no panfleto</label>
+                <select id="store-logo-mode" onchange="updateFlyer()" class="w-full text-xs p-2 border border-slate-300 rounded-lg bg-white">
+                  <option value="both">Logo e nome</option>
+                  <option value="logo">Somente logo</option>
+                  <option value="name">Somente nome</option>
+                </select>
+              </div>
+              <div>
+                <label for="store-logo-size" class="block text-[11px] font-semibold text-slate-600 mb-1">Tamanho do logo</label>
+                <select id="store-logo-size" onchange="updateFlyer()" class="w-full text-xs p-2 border border-slate-300 rounded-lg bg-white">
+                  <option value="small">Pequeno</option>
+                  <option value="medium" selected>Médio</option>
+                  <option value="large">Grande</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subtítulo e Tagline -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Subtítulo / Tagline</label>
+              <input type="text" id="store-tagline" value="Celulares com preço especial e brindes na compra." oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="Ex: Tecnologia com preço especial">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Faixa de Aviso Topo</label>
+              <input type="text" id="store-validity" value="CONFIRA NOSSAS OFERTAS POR TEMPO LIMITADO" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="Aviso de validade">
+            </div>
+          </div>
+
+          <!-- Contatos & Redes Sociais -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">WhatsApp / Telefone</label>
+              <input type="text" id="store-phone" value="66 8134-3028" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="66 9999-0000">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Instagram</label>
+              <input type="text" id="store-social" value="@infomaq_eletro" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="@sualoja">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
+            <div>
+              <label for="store-facebook" class="block text-xs font-semibold text-slate-600 mb-1">Facebook (opcional)</label>
+              <input type="text" id="store-facebook" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="facebook.com/sualoja">
+            </div>
+            <div>
+              <label for="store-youtube" class="block text-xs font-semibold text-slate-600 mb-1">YouTube (opcional)</label>
+              <input type="text" id="store-youtube" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="@canaldaloja">
+            </div>
+            <div>
+              <label for="store-tiktok" class="block text-xs font-semibold text-slate-600 mb-1">TikTok (opcional)</label>
+              <input type="text" id="store-tiktok" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="@loja">
+            </div>
+            <div>
+              <label for="store-site" class="block text-xs font-semibold text-slate-600 mb-1">Site (opcional)</label>
+              <input type="text" id="store-site" oninput="updateFlyer()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg" placeholder="minhaloja.com.br">
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div id="pf-modal-gifts" class="pf-modal no-print" aria-hidden="true">
+    <div class="pf-modal-box" role="dialog" aria-modal="true" aria-labelledby="pf-modal-gifts-title">
+      <div class="pf-modal-head">
+        <span class="pf-modal-title" id="pf-modal-gifts-title">Brindes</span>
+        <button type="button" class="pf-modal-close" data-pf-modal-close aria-label="Fechar Brindes"><span aria-hidden="true">✕</span></button>
+      </div>
+      <div class="pf-modal-body">
+      <!-- SEÇÃO DE CONFIGURAÇÃO DE BRINDES (NOVO) -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div id="gift-section-header" class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex justify-between items-center cursor-pointer" onclick="toggleGiftsSection()">
+          <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+            <i data-lucide="gift" class="w-4 h-4 text-red-600"></i>
+            2. Configurar Seção de Brindes Promocionais
+          </h2>
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="gifts-enabled" checked onchange="handleGiftPreferenceChange()" class="rounded text-amber-500 focus:ring-amber-500 w-4 h-4" onclick="event.stopPropagation()">
+            <span class="text-xs font-semibold text-slate-600">Ativar</span>
+          </div>
+        </div>
+
+        <p id="gifts-disabled-message" class="hidden px-4 py-3 text-xs font-semibold text-slate-500 bg-slate-50">Este layout não possui área de brindes. A seção foi desativada automaticamente.</p>
+        <div id="gifts-panel" class="p-3 space-y-3 bg-amber-50/30">
+          <p class="text-[11px] text-slate-500">Exibido na parte inferior dos layouts Infomaq. Personalize a frase e até 3 itens:</p>
+          
+          <div>
+            <label class="block text-[11px] font-bold text-slate-700 mb-1">Chamada dos Brindes</label>
+            <input type="text" id="gifts-title" value="Comprando seu celular conosco você ganha brindes: película, capinha e uma faca para churrasco." oninput="updateFlyer()" class="w-full text-xs px-3 py-1.5 border border-slate-300 rounded-lg font-medium">
+          </div>
+
+          <div class="grid grid-cols-3 gap-2">
+            <div class="bg-white p-2 rounded-lg border border-slate-200 text-center space-y-1">
+              <span class="text-[10px] font-bold text-amber-700 block">Brinde 1</span>
+              <input type="text" id="gift-1-name" value="Película" oninput="updateFlyer()" class="w-full text-[11px] px-1.5 py-1 border rounded text-center font-bold">
+              <input type="text" id="gift-1-img" value="https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=200&q=80" oninput="updateFlyer()" class="w-full text-[9px] px-1 py-0.5 border rounded text-slate-400" placeholder="URL Imagem">
+            </div>
+            <div class="bg-white p-2 rounded-lg border border-slate-200 text-center space-y-1">
+              <span class="text-[10px] font-bold text-amber-700 block">Brinde 2</span>
+              <input type="text" id="gift-2-name" value="Capinha" oninput="updateFlyer()" class="w-full text-[11px] px-1.5 py-1 border rounded text-center font-bold">
+              <input type="text" id="gift-2-img" value="https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=200&q=80" oninput="updateFlyer()" class="w-full text-[9px] px-1 py-0.5 border rounded text-slate-400" placeholder="URL Imagem">
+            </div>
+            <div class="bg-white p-2 rounded-lg border border-slate-200 text-center space-y-1">
+              <span class="text-[10px] font-bold text-amber-700 block">Brinde 3</span>
+              <input type="text" id="gift-3-name" value="Faca para churrasco" oninput="updateFlyer()" class="w-full text-[11px] px-1.5 py-1 border rounded text-center font-bold">
+              <input type="text" id="gift-3-img" value="https://images.unsplash.com/photo-1593618998160-e34014e67546?auto=format&fit=crop&w=200&q=80" oninput="updateFlyer()" class="w-full text-[9px] px-1 py-0.5 border rounded text-slate-400" placeholder="URL Imagem">
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div id="pf-modal-library" class="pf-modal no-print" aria-hidden="true">
+    <div class="pf-modal-box" role="dialog" aria-modal="true" aria-labelledby="pf-modal-library-title">
+      <div class="pf-modal-head">
+        <span class="pf-modal-title" id="pf-modal-library-title">Biblioteca de Produtos</span>
+        <button type="button" class="pf-modal-close" data-pf-modal-close aria-label="Fechar Biblioteca de Produtos"><span aria-hidden="true">✕</span></button>
+      </div>
+      <div class="pf-modal-body">
+      <!-- CATÁLOGOS LOCAIS DE PRODUTOS -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center gap-2">
+          <i data-lucide="boxes" class="w-4 h-4 text-sky-600"></i>
+          <h2 class="font-bold text-slate-800 text-sm">Biblioteca de Produtos</h2>
+        </div>
+        <div class="p-3 space-y-3">
+          <p class="text-xs text-slate-500">Guarde conjuntos de produtos para reutilizar em outros panfletos.</p>
+          <label for="product-collection-select" class="text-xs font-bold text-slate-700">Conjunto salvo</label>
+          <select id="product-collection-select" class="w-full text-sm px-3 py-2 rounded-lg border border-slate-300 bg-white">
+            <option value="">Selecione um conjunto</option>
+          </select>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" onclick="saveProductCollection()" class="bg-sky-700 hover:bg-sky-800 text-white px-3 py-2 rounded-lg text-xs font-bold">Salvar produtos</button>
+            <button type="button" onclick="loadProductCollection()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg text-xs font-bold">Carregar produtos</button>
+            <button type="button" onclick="deleteProductCollection()" class="bg-white border border-red-200 text-red-700 px-3 py-2 rounded-lg text-xs font-semibold">Excluir conjunto</button>
+          </div>
+          <div class="flex flex-wrap gap-2 border-t border-slate-100 pt-3">
+            <button type="button" onclick="downloadProductsJson()" class="border border-slate-300 bg-white rounded-lg px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> Exportar JSON</button>
+            <button type="button" onclick="document.getElementById('products-json-file').click()" class="border border-slate-300 bg-white rounded-lg px-3 py-2 text-xs font-bold text-slate-700 flex items-center gap-1.5"><i data-lucide="file-up" class="w-3.5 h-3.5"></i> Importar JSON</button>
+            <input id="products-json-file" type="file" accept=".json,application/json" class="hidden" onchange="importProductsJson(event)">
+          </div>
+          <p id="product-library-status" class="text-[11px] text-slate-500" role="status" aria-live="polite">Os produtos atuais também participam do salvamento automático.</p>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
 
   <!-- LÓGICA E SCRIPT DA APLICAÇÃO -->
   <script>
@@ -1676,7 +1778,7 @@
     function resetProductForm() {
       document.getElementById('product-form').reset();
       document.getElementById('product-edit-id').value = '';
-      document.getElementById('form-title').textContent = '3. Adicionar Produto';
+      document.getElementById('form-title').textContent = 'Adicionar Produto';
       document.getElementById('btn-submit-product').innerHTML = `<i data-lucide="plus" class="w-4 h-4"></i><span>Adicionar Produto ao Panfleto</span>`;
       updateImagePreview('');
       refreshIcons();
@@ -1704,6 +1806,7 @@
       document.getElementById('product-spec-4').value = prod.specs && prod.specs[3] ? prod.specs[3] : '';
 
       document.getElementById('form-title').textContent = 'Editar Produto';
+      document.getElementById('pf-products-edit-block')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       document.getElementById('btn-submit-product').innerHTML = `<i data-lucide="check" class="w-4 h-4"></i><span>Salvar Alteração</span>`;
 
       updateImagePreview(prod.image);
@@ -3318,10 +3421,7 @@ window.addEventListener('DOMContentLoaded', () => {
 let baseLayoutTextBlocks = {}; // cada layout original mantém seus textos independentes
 let collapsedPanels = {};
 const PF_CUSTOM_TEXT_PREFIX = 'custom-text:';
-const PF_LEFT_PANEL_IDS = [
-  'project-local', 'saved-layouts', 'layout-and-theme', 'product-gifts',
-  'product-library', 'add-product', 'inserted-products'
-];
+const PF_LEFT_PANEL_IDS = ['products']; // as demais seções agora ficam em pop-ups no menu superior
 
 function getCurrentTextBlocks() {
   const model = getCurrentLayoutModel();
@@ -3559,14 +3659,12 @@ function makePanelCollapsible(card, id, header, title) {
 function initCollapsibleSections() {
   const left = document.querySelector('main > section');
   if (!left) return;
-  const panels = [...left.children].filter(el => el.classList.contains('bg-white'));
-  panels.slice(0, PF_LEFT_PANEL_IDS.length).forEach((card, index) => {
-    const header = card.children[0];
+  const productsCard = document.getElementById('pf-products-card');
+  if (productsCard) {
+    const header = productsCard.children[0];
     const h2 = header?.querySelector('h2');
-    if (!header || !h2) return;
-    const title = h2.textContent.trim().replace(/\s+/g, ' ');
-    makePanelCollapsible(card, PF_LEFT_PANEL_IDS[index], header, title);
-  });
+    if (header && h2) makePanelCollapsible(productsCard, 'products', header, h2.textContent.trim().replace(/\s+/g, ' '));
+  }
   const editorCard = document.querySelector('#pf-right-panel > div.bg-white');
   if (editorCard) {
     const header = editorCard.children[0];
@@ -4591,6 +4689,118 @@ document.addEventListener('keydown', event => {
   if (isTextEntry && !t.closest('#visual-editor-controls')) return;
   event.preventDefault();
   if (isUndo) PFHistory.undo(); else PFHistory.redo();
+});
+  </script>
+
+  <script>
+/* PromoFlyer v8.3 — menu superior, pop-ups e modo de edição avançado ativado por padrão. */
+(function pfTopMenu() {
+  let openModalEl = null;
+  let returnFocusEl = null;
+
+  function closeMenus(exceptMenu) {
+    document.querySelectorAll('.pf-menu.pf-open').forEach(menu => {
+      if (menu === exceptMenu) return;
+      menu.classList.remove('pf-open');
+      menu.querySelector('[data-pf-menu-toggle]')?.setAttribute('aria-expanded', 'false');
+    });
+  }
+  function toggleMenu(menu, forceOpen) {
+    const willOpen = forceOpen ?? !menu.classList.contains('pf-open');
+    closeMenus(willOpen ? menu : null);
+    menu.classList.toggle('pf-open', willOpen);
+    menu.querySelector('[data-pf-menu-toggle]')?.setAttribute('aria-expanded', String(willOpen));
+  }
+  const menuItems = menu => [...menu.querySelectorAll('.pf-menu-item:not(:disabled)')];
+
+  function focusables(root) {
+    return [...root.querySelectorAll('a[href],button:not(:disabled),input:not(:disabled):not([type="hidden"]),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')]
+      .filter(el => el.offsetParent !== null || el === document.activeElement);
+  }
+  function openModal(id, trigger) {
+    const modal = document.getElementById(id);
+    if (!modal) return;
+    closeModal(true);
+    returnFocusEl = trigger || document.activeElement;
+    modal.classList.add('pf-modal-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.documentElement.classList.add('pf-modal-lock');
+    openModalEl = modal;
+    modal.scrollTop = 0;
+    modal.querySelector('.pf-modal-body')?.scrollTo?.(0, 0);
+    modal.querySelector('.pf-modal-close')?.focus();
+  }
+  function closeModal(silent) {
+    if (!openModalEl) return;
+    openModalEl.classList.remove('pf-modal-open');
+    openModalEl.setAttribute('aria-hidden', 'true');
+    document.documentElement.classList.remove('pf-modal-lock');
+    openModalEl = null;
+    if (!silent && returnFocusEl && document.contains(returnFocusEl)) returnFocusEl.focus();
+  }
+  function gotoProducts(id) {
+    const card = document.getElementById(id);
+    if (!card) return;
+    if (typeof updatePanelCollapse === 'function' && typeof collapsedPanels !== 'undefined' && collapsedPanels.products) updatePanelCollapse('products', false);
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    card.classList.remove('pf-flash'); void card.offsetWidth; card.classList.add('pf-flash');
+    setTimeout(() => card.classList.remove('pf-flash'), 1500);
+  }
+
+  document.addEventListener('click', event => {
+    const toggle = event.target.closest('[data-pf-menu-toggle]');
+    if (toggle) { toggleMenu(toggle.closest('.pf-menu')); return; }
+    const item = event.target.closest('.pf-menu-item');
+    if (item) {
+      const menu = item.closest('.pf-menu');
+      const menuButton = menu?.querySelector('[data-pf-menu-toggle]');
+      closeMenus();
+      if (item.dataset.pfModal) openModal(item.dataset.pfModal, menuButton);
+      else if (item.dataset.pfGoto) gotoProducts(item.dataset.pfGoto);
+      return;
+    }
+    if (event.target.closest('[data-pf-modal-close]')) { closeModal(); return; }
+    if (event.target.classList?.contains('pf-modal')) { closeModal(); return; }
+    if (!event.target.closest('.pf-menu')) closeMenus();
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      if (openModalEl) { event.preventDefault(); closeModal(); return; }
+      const open = document.querySelector('.pf-menu.pf-open');
+      if (open) { closeMenus(); open.querySelector('[data-pf-menu-toggle]')?.focus(); }
+      return;
+    }
+    if (event.key === 'Tab' && openModalEl) {
+      const list = focusables(openModalEl);
+      if (!list.length) return;
+      const first = list[0], last = list[list.length - 1];
+      if (!openModalEl.contains(document.activeElement)) { event.preventDefault(); first.focus(); }
+      else if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      return;
+    }
+    const menu = event.target.closest?.('.pf-menu');
+    if (!menu) return;
+    const isToggle = event.target.matches('[data-pf-menu-toggle]');
+    if (isToggle && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+      event.preventDefault(); toggleMenu(menu, true);
+      const items = menuItems(menu); (event.key === 'ArrowDown' ? items[0] : items[items.length - 1])?.focus();
+    } else if (!isToggle && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+      event.preventDefault();
+      const items = menuItems(menu); const i = items.indexOf(document.activeElement);
+      items[(i + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length]?.focus();
+    }
+  });
+
+  window.PFMenu = { openModal, closeModal, closeMenus };
+})();
+
+// Modo de edição avançado (Personalização visual avançada) já inicia ativado.
+window.addEventListener('DOMContentLoaded', () => {
+  try {
+    if (typeof editorEnabled !== 'undefined' && !editorEnabled) toggleVisualEditor();
+  } catch (error) { console.error('Não foi possível ativar a edição avançada por padrão.', error); }
 });
   </script>
 
